@@ -1487,9 +1487,9 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version a210b7d86, updated Thu Sep 16 13:45:19 2021 -0700" name="generator">
+  <meta content="Bikeshed version dfbc2b297, updated Thu Nov 11 15:52:32 2021 -0800" name="generator">
   <link href="https://gpuweb.github.io/gpuweb/explainer/" rel="canonical">
-  <meta content="af8f60111f53446f961e7e5b243d3f1d6f6b1f49" name="document-revision">
+  <meta content="fbe91716fb867d6260f33bbbdd0f65f22ec146df" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -1730,6 +1730,16 @@ figcaption:not(.no-marker)::before {
 }
 
 .dfn-paneled { cursor: pointer; }
+</style>
+<style>/* style-issues */
+
+a[href].issue-return {
+    float: right;
+    float: inline-end;
+    color: var(--issueheading-text);
+    font-weight: bold;
+    text-decoration: none;
+}
 </style>
 <style>/* style-md-lists */
 
@@ -2046,7 +2056,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">WebGPU Explainer</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="profile-and-date"><span class="content">Living Standard, <time class="dt-updated" datetime="2021-09-30">30 September 2021</time></span></h2>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#LS">Living Standard</a>, <time class="dt-updated" datetime="2021-11-15">15 November 2021</time></p>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -2212,8 +2222,8 @@ Learn more about <a href="http://www.w3.org/community/">W3C Community and Busine
    </ol>
   </nav>
   <main>
-   <p class="issue" id="issue-30876714"><a class="self-link" href="#issue-30876714"></a> Set up cross-linking into the WebGPU and WGSL specs. <a href="https://github.com/tabatkins/bikeshed/issues/2006">&lt;https://github.com/tabatkins/bikeshed/issues/2006></a></p>
-   <p class="issue" id="issue-c681b067"><a class="self-link" href="#issue-c681b067"></a> Complete the planned sections. <a href="https://github.com/gpuweb/gpuweb/issues/1321">&lt;https://github.com/gpuweb/gpuweb/issues/1321></a></p>
+   <p class="issue" id="issue-30876714"><a class="self-link" href="#issue-30876714"></a> Set up cross-linking into the WebGPU and WGSL specs. <a href="https://github.com/tabatkins/bikeshed/issues/2006">[Issue #tabatkins/bikeshed#2006]</a></p>
+   <p class="issue" id="issue-c681b067"><a class="self-link" href="#issue-c681b067"></a> Complete the planned sections. <a href="https://github.com/gpuweb/gpuweb/issues/1321">[Issue #gpuweb/gpuweb#1321]</a></p>
    <h2 class="heading settled" data-level="1" id="introduction"><span class="secno">1. </span><span class="content">Introduction</span><a class="self-link" href="#introduction"></a></h2>
    <p>WebGPU is a proposed Web API to enable webpages to use the system’s <a href="https://en.wikipedia.org/wiki/Graphics_processing_unit">GPU (Graphics Processing Unit)</a> to perform computations and draw complex images that can be presented inside the page.
 This goal is similar to the <a href="https://www.khronos.org/webgl/">WebGL</a> family of APIs, but WebGPU enables access to more advanced features of GPUs.
@@ -2691,7 +2701,7 @@ This makes it easier for developers to test their app’s behavior in different 
 improves robustness of applications in the wild, and improves portability between browsers.</p>
    <p class="issue" id="issue-a7ca2e8b"><a class="self-link" href="#issue-a7ca2e8b"></a> Finish this explainer (see <a href="https://github.com/gpuweb/gpuweb/blob/main/design/ErrorHandling.md#fatal-errors-requestadapter-requestdevice-and-devicelost">ErrorHandling.md</a>).</p>
    <h3 class="heading settled" data-level="3.5" id="buffer-mapping"><span class="secno">3.5. </span><span class="content">Buffer Mapping</span><a class="self-link" href="#buffer-mapping"></a></h3>
-   <p>A <code>GPUBuffer</code> represents a memory allocations usable by other GPU operations.
+   <p>A <code>GPUBuffer</code> represents a memory allocation usable by other GPU operations.
 This memory can be accessed linearly, contrary to <code>GPUTexture</code> for which the actual memory layout of sequences of texels are unknown. Think of <code>GPUBuffers</code> as the result of <code>gpu_malloc()</code>.</p>
    <p><strong>CPU→GPU:</strong> When using WebGPU, applications need to transfer data from JavaScript to <code>GPUBuffer</code> very often and potentially in large quantities.
 This includes mesh data, drawing and computations parameters, ML model inputs, etc.
@@ -3130,7 +3140,7 @@ APIs that are expected to be "hot paths" (like command encoder methods), causing
 parts of the API that <em>do</em> use it.</p>
    <p>See also issue <a href="https://github.com/gpuweb/gpuweb/issues/747">#747</a> which mentions that strongly-typed bitflags in JavaScript would be useful.</p>
    <h2 class="heading settled" data-level="4" id="questionnaire"><span class="secno">4. </span><span class="content">Security and Privacy (self-review)</span><a class="self-link" href="#questionnaire"></a></h2>
-   <p>This section is the Security and Privacry self-review.
+   <p>This section is the Security and Privacy self-review.
 You can also see the <a href="https://gpuweb.github.io/gpuweb/#malicious-use">Malicious use considerations</a> section of the specification.</p>
    <h3 class="heading settled" data-level="4.1" id="questionnaire-1"><span class="secno">4.1. </span><span class="content">What information might this feature expose to Web sites or other parties, and for what purposes is that exposure necessary?</span><a class="self-link" href="#questionnaire-1"></a></h3>
    <p>The feature exposes information about the system’s GPUs (or lack thereof).</p>
@@ -3381,13 +3391,13 @@ However investigation in WebGL show that GPU timings can be used to leak from su
   </dl>
   <h2 class="no-num no-ref heading settled" id="issues-index"><span class="content">Issues Index</span><a class="self-link" href="#issues-index"></a></h2>
   <div style="counter-reset:issue">
-   <div class="issue"> Set up cross-linking into the WebGPU and WGSL specs. <a href="https://github.com/tabatkins/bikeshed/issues/2006">&lt;https://github.com/tabatkins/bikeshed/issues/2006></a><a href="#issue-30876714"> ↵ </a></div>
-   <div class="issue"> Complete the planned sections. <a href="https://github.com/gpuweb/gpuweb/issues/1321">&lt;https://github.com/gpuweb/gpuweb/issues/1321></a><a href="#issue-c681b067"> ↵ </a></div>
-   <div class="issue"> Finish this explainer (see <a href="https://github.com/gpuweb/gpuweb/blob/main/design/ErrorHandling.md#fatal-errors-requestadapter-requestdevice-and-devicelost">ErrorHandling.md</a>).<a href="#issue-a7ca2e8b"> ↵ </a></div>
-   <div class="issue"> Briefly explain passes?<a href="#issue-872b53a1"> ↵ </a></div>
-   <div class="issue"> Exact API still in flux as of this writing.<a href="#issue-829f95ec"> ↵ </a></div>
-   <div class="issue"> Update both names to whatever we settle on.<a href="#issue-eb515afc"> ↵ </a></div>
-   <div class="issue"> Describe how this is achieved for video element, VideoFrame, canvas element, and OffscreenCanvas.<a href="#issue-effdb8e6"> ↵ </a></div>
+   <div class="issue"> Set up cross-linking into the WebGPU and WGSL specs. <a href="https://github.com/tabatkins/bikeshed/issues/2006">[Issue #tabatkins/bikeshed#2006]</a> <a class="issue-return" href="#issue-30876714" title="Jump to section">↵</a></div>
+   <div class="issue"> Complete the planned sections. <a href="https://github.com/gpuweb/gpuweb/issues/1321">[Issue #gpuweb/gpuweb#1321]</a> <a class="issue-return" href="#issue-c681b067" title="Jump to section">↵</a></div>
+   <div class="issue"> Finish this explainer (see <a href="https://github.com/gpuweb/gpuweb/blob/main/design/ErrorHandling.md#fatal-errors-requestadapter-requestdevice-and-devicelost">ErrorHandling.md</a>). <a class="issue-return" href="#issue-a7ca2e8b" title="Jump to section">↵</a></div>
+   <div class="issue"> Briefly explain passes? <a class="issue-return" href="#issue-872b53a1" title="Jump to section">↵</a></div>
+   <div class="issue"> Exact API still in flux as of this writing. <a class="issue-return" href="#issue-829f95ec" title="Jump to section">↵</a></div>
+   <div class="issue"> Update both names to whatever we settle on. <a class="issue-return" href="#issue-eb515afc" title="Jump to section">↵</a></div>
+   <div class="issue"> Describe how this is achieved for video element, VideoFrame, canvas element, and OffscreenCanvas. <a class="issue-return" href="#issue-effdb8e6" title="Jump to section">↵</a></div>
   </div>
 <script>/* script-dfn-panel */
 
