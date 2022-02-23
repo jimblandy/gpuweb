@@ -1269,7 +1269,7 @@ Possible extra rowspan handling
 	ul.index ul,
 	ul.index dl { font-size: smaller; }
 	@media not print {
-		ul.index li span:not(.dfn-paneled) {
+		ul.index li a + span {
 			white-space: nowrap;
 			color: transparent; }
 		ul.index li a:hover + span,
@@ -1487,9 +1487,9 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version dfbc2b297, updated Thu Nov 11 15:52:32 2021 -0800" name="generator">
+  <meta content="Bikeshed version 2e3c4c68b, updated Fri Jan 14 14:49:00 2022 -0800" name="generator">
   <link href="https://gpuweb.github.io/gpuweb/explainer/" rel="canonical">
-  <meta content="fbe91716fb867d6260f33bbbdd0f65f22ec146df" name="document-revision">
+  <meta content="69b8a3b60ff9fd423e3fa4ea5150361169f168b2" name="document-revision">
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -2056,7 +2056,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">WebGPU Explainer</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#LS">Living Standard</a>, <time class="dt-updated" datetime="2021-11-15">15 November 2021</time></p>
+   <h2 class="no-num no-toc no-ref heading settled" id="profile-and-date"><span class="content">Living Standard, <time class="dt-updated" datetime="2022-02-23">23 February 2022</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -2072,20 +2072,9 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
     </dl>
    </div>
    <div data-fill-with="warning"></div>
-   <p class="copyright" data-fill-with="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2021 the Contributors to the WebGPU Explainer Specification, published by the <a href="http://www.w3.org/community/gpu/">GPU for the Web Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
+   <p class="copyright" data-fill-with="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2022 the Contributors to the WebGPU Explainer Specification, published by the <a href="http://www.w3.org/community/gpu/">GPU for the Web Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
 A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/">summary</a> is available. </p>
    <hr title="Separator for header">
-  </div>
-  <div data-fill-with="at-risk"></div>
-  <h2 class="no-num no-toc no-ref heading settled" id="status"><span class="content">Status of this document</span></h2>
-  <div data-fill-with="status">
-   This specification was published by the <a href="https://www.w3.org/community/gpu/">GPU for the Web Community Group</a>.
-It is not a W3C Standard nor is it on the W3C Standards Track.
-
-Please note that under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a> there is a limited opt-out and other conditions apply.
-
-Learn more about <a href="http://www.w3.org/community/">W3C Community and Business Groups</a>. 
-   <p></p>
   </div>
   <div data-fill-with="at-risk"></div>
   <nav data-fill-with="table-of-contents" id="toc">
@@ -2862,8 +2851,8 @@ saveScreenshot<c- p>(</c->buffer<c- p>.</c->getMappedRange<c- p>());</c->
 buffer<c- p>.</c->unmap<c- p>();</c->
 </pre>
    </div>
-   <div class="example" id="example-4985989c">
-    <a class="self-link" href="#example-4985989c"></a> Updating a bunch of data on the GPU for a frame: 
+   <div class="example" id="example-eed014f1">
+    <a class="self-link" href="#example-eed014f1"></a> Updating a bunch of data on the GPU for a frame: 
 <pre class="highlight"><c- k>void</c-> frame<c- p>()</c-> <c- p>{</c->
     <c- c1>// Create a new buffer for our updates. In practice we would</c->
     <c- c1>// reuse buffers from frame to frame by re-mapping them.</c->
@@ -2895,7 +2884,7 @@ buffer<c- p>.</c->unmap<c- p>();</c->
 
         encodeDraw<c- p>(</c->renderPass<c- p>,</c-> <c- p>{</c->uniformBuffer<c- p>,</c-> uniformOffset<c- p>});</c->
     <c- p>}</c->
-    renderPass<c- p>.</c->endPass<c- p>();</c->
+    renderPass<c- p>.</c->end<c- p>();</c->
 
     <c- c1>// We are finished filling the staging buffer, unmap() it so</c->
     <c- c1>// we can submit commands that use it.</c->
@@ -2948,8 +2937,8 @@ See <a href="https://gpuweb.github.io/gpuweb/#security-timing">Timing attacks</a
       <p>Main: <code>B1.mapAsync()</code> → <strong>throws an exception</strong> (and doesn’t change the state of the buffer).</p>
      <li data-md>
       <p>Main: encodes some command that uses <code>B1</code>, like:</p>
-<pre class="language-js highlight">        encoder<c- p>.</c->copyBufferToTexture<c- p>(</c->B1<c- p>,</c-> T<c- p>);</c->
-        <c- a>const</c-> commandBuffer <c- o>=</c-> encoder<c- p>.</c->finish<c- p>();</c->
+<pre class="language-js highlight">encoder<c- p>.</c->copyBufferToTexture<c- p>(</c->B1<c- p>,</c-> T<c- p>);</c->
+<c- a>const</c-> commandBuffer <c- o>=</c-> encoder<c- p>.</c->finish<c- p>();</c->
 </pre>
       <p>→ succeeds, because this doesn’t depend on the buffer’s client side state.</p>
      <li data-md>
