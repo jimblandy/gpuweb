@@ -238,7 +238,6 @@ module.exports = grammar({
     ],
 
     conflicts: $ => [
-        [$.array_type_decl],
         [$.type_decl,$.primary_expression],
     ],
 
@@ -426,6 +425,7 @@ with open(grammar_path + "/package.json", "w") as grammar_package:
     grammar_package.write('}\n')
 
 # External scanner for nested block comments
+# For the API, see https://tree-sitter.github.io/tree-sitter/creating-parsers#external-scanners
 # See: https://github.com/tree-sitter/tree-sitter-rust/blob/master/src/scanner.c
 
 os.makedirs(os.path.join(grammar_path, "src"), exist_ok=True)
@@ -461,6 +461,11 @@ bool tree_sitter_wgsl_external_scanner_scan(void *payload, TSLexer *lexer,
     for (;;) {
       switch (lexer->lookahead) {
         case '\0':
+          /* This signals the end of input. Since nesting depth is
+           * greater than zero, the scanner is in the middle of
+           * a block comment. Block comments must be affirmatively
+           * terminated.
+           */
           return false;
         case '*':
           advance(lexer);
@@ -500,7 +505,8 @@ subprocess.run(["npm", "install"], cwd=grammar_path, check=True)
 subprocess.run(["npx", "tree-sitter", "generate"],
                cwd=grammar_path, check=True)
 # Following are commented for future reference to expose playground
-# subprocess.run(["npx", "tree-sitter", "build-wasm"],
+# Remove "--docker" if local environment matches with the container
+# subprocess.run(["npx", "tree-sitter", "build-wasm", "--docker"],
 #                cwd=grammar_path, check=True)
 
 Language.build_library(
@@ -524,7 +530,8 @@ for key, value in scanner_components[scanner_example.name()].items():
     if "function-scope" in key:
         value = ["fn function__scope____() {"] + value + ["}"]
     if "type-scope" in key:
-        value = ["let type_scope____: "] + value + [";"]
+        # Initiailize with zero-value expression.
+        value = ["let type_scope____: "] + value + ["="] + value + ["()"] + [";"]
     program = "\n".join(value)
     tree = parser.parse(bytes(program, "utf8"))
     if tree.root_node.has_error:
