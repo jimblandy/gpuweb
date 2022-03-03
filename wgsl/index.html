@@ -8,7 +8,7 @@
   <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
   <meta content="Bikeshed version 2e3c4c68b, updated Fri Jan 14 14:49:00 2022 -0800" name="generator">
   <link href="https://www.w3.org/TR/WGSL/" rel="canonical">
-  <meta content="69b8a3b60ff9fd423e3fa4ea5150361169f168b2" name="document-revision">
+  <meta content="2f2d651d93aff4beb263424bee034d8d75f319d4" name="document-revision">
 <style>
 tr:nth-child(2n) {
   background-color: #b0b0b050;
@@ -629,7 +629,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">WebGPU Shading Language</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">Editor’s Draft</a>, <time class="dt-updated" datetime="2022-02-23">23 February 2022</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">Editor’s Draft</a>, <time class="dt-updated" datetime="2022-03-03">3 March 2022</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -835,10 +835,11 @@ Learn more about <a href="http://www.w3.org/community/">W3C Community and Busine
         <li><a href="#for-statement"><span class="secno">7.4.4</span> <span class="content">For Statement</span></a>
         <li><a href="#while-statement"><span class="secno">7.4.5</span> <span class="content">While Statement</span></a>
         <li><a href="#break-statement"><span class="secno">7.4.6</span> <span class="content">Break Statement</span></a>
-        <li><a href="#continue-statement"><span class="secno">7.4.7</span> <span class="content">Continue Statement</span></a>
-        <li><a href="#continuing-statement"><span class="secno">7.4.8</span> <span class="content">Continuing Statement</span></a>
-        <li><a href="#return-statement"><span class="secno">7.4.9</span> <span class="content">Return Statement</span></a>
-        <li><a href="#discard-statement"><span class="secno">7.4.10</span> <span class="content">Discard Statement</span></a>
+        <li><a href="#break-if-statement"><span class="secno">7.4.7</span> <span class="content">Break-If Statement</span></a>
+        <li><a href="#continue-statement"><span class="secno">7.4.8</span> <span class="content">Continue Statement</span></a>
+        <li><a href="#continuing-statement"><span class="secno">7.4.9</span> <span class="content">Continuing Statement</span></a>
+        <li><a href="#return-statement"><span class="secno">7.4.10</span> <span class="content">Return Statement</span></a>
+        <li><a href="#discard-statement"><span class="secno">7.4.11</span> <span class="content">Discard Statement</span></a>
        </ol>
       <li><a href="#function-call-statement"><span class="secno">7.5</span> <span class="content">Function Call Statement</span></a>
       <li><a href="#statements-summary"><span class="secno">7.6</span> <span class="content">Statements Grammar Summary</span></a>
@@ -2795,9 +2796,9 @@ When <var>V</var> is placed at byte offset <var>k</var> of host-shared buffer, t
     <li data-md>
      <p>Byte <var>k</var>+1 contains bits 8 through 15 of the fraction.</p>
     <li data-md>
-     <p>Bits 0 through 6 of byte <var>k</var>+2 contain bits 16 through 23 of the fraction.</p>
+     <p>Bits 0 through 6 of byte <var>k</var>+2 contain bits 16 through 22 of the fraction.</p>
     <li data-md>
-     <p>Bit 7 of byte <var>k</var>+2 contains bit 0 bit of the exponent.</p>
+     <p>Bit 7 of byte <var>k</var>+2 contains bit 0 of the exponent.</p>
     <li data-md>
      <p>Bits 0 through 6 of byte <var>k</var>+3 contain bits 1 through 7 of the exponent.</p>
     <li data-md>
@@ -2813,26 +2814,17 @@ byte offset <var>k</var> of a host-shared buffer, then:</p>
     <li data-md>
      <p><var>V</var>.x is placed at byte offset <var>k</var></p>
     <li data-md>
-     <p><var>V</var>.y is placed at byte offset <var>k</var>+4</p>
+     <p><var>V</var>.y is placed at byte offset <var>k</var> + <a data-link-type="dfn" href="#sizeof" id="ref-for-sizeof⑨">SizeOf</a>(<var>T</var>)</p>
     <li data-md>
-     <p>If <var>N</var> ≥ 3, then <var>V</var>.z is placed at byte offset <var>k</var>+8</p>
+     <p>If <var>N</var> ≥ 3, then <var>V</var>.z is placed at byte offset <var>k</var> + 2 × <a data-link-type="dfn" href="#sizeof" id="ref-for-sizeof①⓪">SizeOf</a>(<var>T</var>)</p>
     <li data-md>
-     <p>If <var>N</var> ≥ 4, then <var>V</var>.w is placed at byte offset <var>k</var>+12</p>
+     <p>If <var>N</var> ≥ 4, then <var>V</var>.w is placed at byte offset <var>k</var> + 3 × <a data-link-type="dfn" href="#sizeof" id="ref-for-sizeof①①">SizeOf</a>(<var>T</var>)</p>
    </ul>
-   <p>When a matrix value <var>M</var> is placed at byte offset <var>k</var> of a host-shared memory buffer, then:</p>
+   <p>When a value <var>V</var> of matrix type mat<var>N</var>x<var>M</var>&lt;<var>T</var>> is placed at
+byte offset <var>k</var> of a host-shared buffer, then:</p>
    <ul>
     <li data-md>
-     <p>If <var>M</var> has 2 rows, then:</p>
-     <ul>
-      <li data-md>
-       <p>Column vector <var>i</var> of <var>M</var> is placed at byte offset <var>k</var> + 8 × <var>i</var></p>
-     </ul>
-    <li data-md>
-     <p>If <var>M</var> has 3 or 4 rows, then:</p>
-     <ul>
-      <li data-md>
-       <p>Column vector <var>i</var> of <var>M</var> is placed at byte offset <var>k</var> + 16 × <var>i</var></p>
-     </ul>
+     <p>Column vector <var>i</var> of <var>V</var> is placed at byte offset <var>k</var> + <var>i</var> × <a data-link-type="dfn" href="#alignof" id="ref-for-alignof①①">AlignOf</a>(vec<var>M</var>&lt;<var>T</var>>)</p>
    </ul>
    <p>When a value of array type <var>A</var> is placed at byte offset <var>k</var> of a host-shared memory buffer,
 then:</p>
@@ -2866,32 +2858,32 @@ used in address space <var>C</var>.</p>
     <tbody>
      <tr>
       <td><a data-link-type="dfn" href="#i32" id="ref-for-i32⑧">i32</a>, <a data-link-type="dfn" href="#u32" id="ref-for-u32⑥">u32</a>, or <a data-link-type="dfn" href="#f32" id="ref-for-f32⑤">f32</a> 
-      <td><a data-link-type="dfn" href="#alignof" id="ref-for-alignof①①">AlignOf</a>(<var>S</var>) 
       <td><a data-link-type="dfn" href="#alignof" id="ref-for-alignof①②">AlignOf</a>(<var>S</var>) 
+      <td><a data-link-type="dfn" href="#alignof" id="ref-for-alignof①③">AlignOf</a>(<var>S</var>) 
      <tr>
       <td>atomic&lt;T> 
-      <td><a data-link-type="dfn" href="#alignof" id="ref-for-alignof①③">AlignOf</a>(<var>S</var>) 
       <td><a data-link-type="dfn" href="#alignof" id="ref-for-alignof①④">AlignOf</a>(<var>S</var>) 
+      <td><a data-link-type="dfn" href="#alignof" id="ref-for-alignof①⑤">AlignOf</a>(<var>S</var>) 
      <tr>
       <td>vecN&lt;T> 
-      <td><a data-link-type="dfn" href="#alignof" id="ref-for-alignof①⑤">AlignOf</a>(<var>S</var>) 
       <td><a data-link-type="dfn" href="#alignof" id="ref-for-alignof①⑥">AlignOf</a>(<var>S</var>) 
+      <td><a data-link-type="dfn" href="#alignof" id="ref-for-alignof①⑦">AlignOf</a>(<var>S</var>) 
      <tr class="algorithm" data-algorithm="alignment of a matrix with N columns and M rows">
       <td>matNxM&lt;f32> 
-      <td><a data-link-type="dfn" href="#alignof" id="ref-for-alignof①⑦">AlignOf</a>(<var>S</var>) 
       <td><a data-link-type="dfn" href="#alignof" id="ref-for-alignof①⑧">AlignOf</a>(<var>S</var>) 
+      <td><a data-link-type="dfn" href="#alignof" id="ref-for-alignof①⑨">AlignOf</a>(<var>S</var>) 
      <tr class="algorithm" data-algorithm="alignment of an array">
       <td>array&lt;T, N> 
-      <td><a data-link-type="dfn" href="#alignof" id="ref-for-alignof①⑨">AlignOf</a>(<var>S</var>) 
-      <td><a data-link-type="dfn" href="#roundup" id="ref-for-roundup⑥">roundUp</a>(16, <a data-link-type="dfn" href="#alignof" id="ref-for-alignof②⓪">AlignOf</a>(<var>S</var>)) 
+      <td><a data-link-type="dfn" href="#alignof" id="ref-for-alignof②⓪">AlignOf</a>(<var>S</var>) 
+      <td><a data-link-type="dfn" href="#roundup" id="ref-for-roundup⑥">roundUp</a>(16, <a data-link-type="dfn" href="#alignof" id="ref-for-alignof②①">AlignOf</a>(<var>S</var>)) 
      <tr class="algorithm" data-algorithm="alignment of an runtime-sized array">
       <td>array&lt;T> 
-      <td><a data-link-type="dfn" href="#alignof" id="ref-for-alignof②①">AlignOf</a>(<var>S</var>) 
-      <td><a data-link-type="dfn" href="#roundup" id="ref-for-roundup⑦">roundUp</a>(16, <a data-link-type="dfn" href="#alignof" id="ref-for-alignof②②">AlignOf</a>(<var>S</var>)) 
+      <td><a data-link-type="dfn" href="#alignof" id="ref-for-alignof②②">AlignOf</a>(<var>S</var>) 
+      <td><a data-link-type="dfn" href="#roundup" id="ref-for-roundup⑦">roundUp</a>(16, <a data-link-type="dfn" href="#alignof" id="ref-for-alignof②③">AlignOf</a>(<var>S</var>)) 
      <tr class="algorithm" data-algorithm="alignment of a structure">
       <td>struct <var>S</var> 
-      <td><a data-link-type="dfn" href="#alignof" id="ref-for-alignof②③">AlignOf</a>(<var>S</var>) 
-      <td><a data-link-type="dfn" href="#roundup" id="ref-for-roundup⑧">roundUp</a>(16, <a data-link-type="dfn" href="#alignof" id="ref-for-alignof②④">AlignOf</a>(<var>S</var>))<br> 
+      <td><a data-link-type="dfn" href="#alignof" id="ref-for-alignof②④">AlignOf</a>(<var>S</var>) 
+      <td><a data-link-type="dfn" href="#roundup" id="ref-for-roundup⑧">roundUp</a>(16, <a data-link-type="dfn" href="#alignof" id="ref-for-alignof②⑤">AlignOf</a>(<var>S</var>))<br> 
    </table>
    <p>Structure members of type <var>T</var> must have a byte offset
 from the start of the structure that is a multiple of the <a data-link-type="dfn" href="#requiredalignof" id="ref-for-requiredalignof③">RequiredAlignOf</a>(<var>T</var>, <var>C</var>)
@@ -2902,7 +2894,7 @@ multiple of the <a data-link-type="dfn" href="#requiredalignof" id="ref-for-requ
    <p class="algorithm" data-algorithm="array element minimum alignment"> <a data-link-type="dfn" href="#strideof" id="ref-for-strideof③">StrideOf</a>(array&lt;<var>T</var>, <var>N</var>>) = <var>k</var> × <a data-link-type="dfn" href="#requiredalignof" id="ref-for-requiredalignof⑥">RequiredAlignOf</a>(<var>T</var>, C)<br> <a data-link-type="dfn" href="#strideof" id="ref-for-strideof④">StrideOf</a>(array&lt;<var>T</var>>) = <var>k</var> × <a data-link-type="dfn" href="#requiredalignof" id="ref-for-requiredalignof⑦">RequiredAlignOf</a>(<var>T</var>, C)<br> Where <var>k</var> is a positive integer </p>
    <p class="note" role="note"><span>Note:</span> <a data-link-type="dfn" href="#requiredalignof" id="ref-for-requiredalignof⑧">RequiredAlignOf</a>(<var>T</var>, <var>C</var>) does not impose any additional restrictions
 on the values permitted for an <a data-link-type="dfn" href="#attribute-align" id="ref-for-attribute-align④">align</a> decoration, nor does it affect the rules
-of <a data-link-type="dfn" href="#alignof" id="ref-for-alignof②⑤">AlignOf</a>(<var>T</var>). Data is laid out with the rules defined in previous
+of <a data-link-type="dfn" href="#alignof" id="ref-for-alignof②⑥">AlignOf</a>(<var>T</var>). Data is laid out with the rules defined in previous
 sections and then the resulting layout is validated against the <a data-link-type="dfn" href="#requiredalignof" id="ref-for-requiredalignof⑨">RequiredAlignOf</a>(<var>T</var>, <var>C</var>) rules.</p>
    <p>The <a data-link-type="dfn" href="#address-spaces-uniform" id="ref-for-address-spaces-uniform⑥">uniform</a> address space also requires that:</p>
    <ul>
@@ -2912,7 +2904,7 @@ That is, <a data-link-type="dfn" href="#strideof" id="ref-for-strideof⑤">Strid
     <li data-md>
      <p>If a structure member itself has a structure type <code>S</code>, then the number of
 bytes between the start of that member and the start of any following member
-must be at least <a data-link-type="dfn" href="#roundup" id="ref-for-roundup⑨">roundUp</a>(16, <a data-link-type="dfn" href="#sizeof" id="ref-for-sizeof⑨">SizeOf</a>(S)).</p>
+must be at least <a data-link-type="dfn" href="#roundup" id="ref-for-roundup⑨">roundUp</a>(16, <a data-link-type="dfn" href="#sizeof" id="ref-for-sizeof①②">SizeOf</a>(S)).</p>
    </ul>
    <p class="note" role="note"><span>Note:</span> The following examples show how to use <a data-link-type="dfn" href="#attribute-align" id="ref-for-attribute-align⑤">align</a> and <a data-link-type="dfn" href="#attribute-size" id="ref-for-attribute-size⑤">size</a> attributes
 on structure members to satisfy layout requirements for uniform buffers.
@@ -5724,6 +5716,15 @@ When a <a data-link-type="dfn" href="#declaration" id="ref-for-declaration②">d
      <dfn class="dfn-paneled" data-dfn-for="syntax" data-dfn-type="dfn" data-noexport id="syntax-compound_statement">compound_statement</dfn> : 
     <p>| <a data-link-type="dfn" href="#syntax-brace_left" id="ref-for-syntax-brace_left①">brace_left</a> <a data-link-type="dfn" href="#syntax-statement" id="ref-for-syntax-statement">statement</a> * <a data-link-type="dfn" href="#syntax-brace_right" id="ref-for-syntax-brace_right①">brace_right</a></p>
    </div>
+   <p>There are two special forms of compound statement:</p>
+   <ul>
+    <li data-md>
+     <p>a <a data-link-type="dfn" href="#syntax-continuing_compound_statement" id="ref-for-syntax-continuing_compound_statement">continuing_compound_statement</a> forms the body of a <a href="#continuing-statement">continuing</a> statement,
+ and allows an optional <a href="#break-if-statement">break-if</a> statement at the end.</p>
+    <li data-md>
+     <p>a <a data-link-type="dfn" href="#syntax-case_compound_statement" id="ref-for-syntax-case_compound_statement">case_compound_statement</a> forms the body of a <code>case</code> or <code>default</code> clause in a <a href="#switch-statement">switch</a> statement,
+ and allows an optional <a data-link-type="dfn" href="#syntax-fallthrough_statement" id="ref-for-syntax-fallthrough_statement">fallthrough</a> statement at the end.</p>
+   </ul>
    <h3 class="heading settled" data-level="7.2" id="assignment"><span class="secno">7.2. </span><span class="content">Assignment Statement</span><a class="self-link" href="#assignment"></a></h3>
    <p>An <dfn class="dfn-paneled" data-dfn-for="statement" data-dfn-type="dfn" data-noexport id="statement-assignment">assignment</dfn> evaluates an expression,
 and optionally stores it in memory (thus updating the contents of a variable).</p>
@@ -6023,16 +6024,19 @@ associated with the <code>else</code> clause (if it exists).</p>
    </div>
    <div class="syntax">
      <dfn class="dfn-paneled" data-dfn-for="syntax" data-dfn-type="dfn" data-noexport id="syntax-switch_body">switch_body</dfn> : 
-    <p>| <a data-link-type="dfn" href="#syntax-case" id="ref-for-syntax-case">case</a> <a data-link-type="dfn" href="#syntax-case_selectors" id="ref-for-syntax-case_selectors">case_selectors</a> <a data-link-type="dfn" href="#syntax-colon" id="ref-for-syntax-colon①">colon</a> <a data-link-type="dfn" href="#syntax-brace_left" id="ref-for-syntax-brace_left③">brace_left</a> <a data-link-type="dfn" href="#syntax-case_body" id="ref-for-syntax-case_body">case_body</a> ? <a data-link-type="dfn" href="#syntax-brace_right" id="ref-for-syntax-brace_right③">brace_right</a></p>
-    <p>| <a data-link-type="dfn" href="#syntax-default" id="ref-for-syntax-default">default</a> <a data-link-type="dfn" href="#syntax-colon" id="ref-for-syntax-colon②">colon</a> <a data-link-type="dfn" href="#syntax-brace_left" id="ref-for-syntax-brace_left④">brace_left</a> <a data-link-type="dfn" href="#syntax-case_body" id="ref-for-syntax-case_body①">case_body</a> ? <a data-link-type="dfn" href="#syntax-brace_right" id="ref-for-syntax-brace_right④">brace_right</a></p>
+    <p>| <a data-link-type="dfn" href="#syntax-case" id="ref-for-syntax-case">case</a> <a data-link-type="dfn" href="#syntax-case_selectors" id="ref-for-syntax-case_selectors">case_selectors</a> <a data-link-type="dfn" href="#syntax-colon" id="ref-for-syntax-colon①">colon</a> <a data-link-type="dfn" href="#syntax-case_compound_statement" id="ref-for-syntax-case_compound_statement①">case_compound_statement</a></p>
+    <p>| <a data-link-type="dfn" href="#syntax-default" id="ref-for-syntax-default">default</a> <a data-link-type="dfn" href="#syntax-colon" id="ref-for-syntax-colon②">colon</a> <a data-link-type="dfn" href="#syntax-case_compound_statement" id="ref-for-syntax-case_compound_statement②">case_compound_statement</a></p>
    </div>
    <div class="syntax">
      <dfn class="dfn-paneled" data-dfn-for="syntax" data-dfn-type="dfn" data-noexport id="syntax-case_selectors">case_selectors</dfn> : 
     <p>| <a data-link-type="dfn" href="#syntax-const_literal" id="ref-for-syntax-const_literal②">const_literal</a> ( <a data-link-type="dfn" href="#syntax-comma" id="ref-for-syntax-comma①①">comma</a> <a data-link-type="dfn" href="#syntax-const_literal" id="ref-for-syntax-const_literal③">const_literal</a> ) * <a data-link-type="dfn" href="#syntax-comma" id="ref-for-syntax-comma①②">comma</a> ?</p>
    </div>
    <div class="syntax">
-     <dfn class="dfn-paneled" data-dfn-for="syntax" data-dfn-type="dfn" data-noexport id="syntax-case_body">case_body</dfn> : 
-    <p>| <a data-link-type="dfn" href="#syntax-statement" id="ref-for-syntax-statement①">statement</a> <a data-link-type="dfn" href="#syntax-case_body" id="ref-for-syntax-case_body②">case_body</a> ?</p>
+     <dfn class="dfn-paneled" data-dfn-for="syntax" data-dfn-type="dfn" data-noexport id="syntax-case_compound_statement">case_compound_statement</dfn> : 
+    <p>| <a data-link-type="dfn" href="#syntax-brace_left" id="ref-for-syntax-brace_left③">brace_left</a> <a data-link-type="dfn" href="#syntax-statement" id="ref-for-syntax-statement①">statement</a> * <a data-link-type="dfn" href="#syntax-fallthrough_statement" id="ref-for-syntax-fallthrough_statement①">fallthrough_statement</a> ? <a data-link-type="dfn" href="#syntax-brace_right" id="ref-for-syntax-brace_right③">brace_right</a></p>
+   </div>
+   <div class="syntax">
+     <dfn class="dfn-paneled" data-dfn-for="syntax" data-dfn-type="dfn" data-noexport id="syntax-fallthrough_statement">fallthrough_statement</dfn> : 
     <p>| <a data-link-type="dfn" href="#syntax-fallthrough" id="ref-for-syntax-fallthrough">fallthrough</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon①">semicolon</a></p>
    </div>
    <p>A <dfn class="dfn-paneled" data-dfn-for="statement" data-dfn-type="dfn" data-noexport id="statement-switch">switch</dfn> statement transfers control to one of a set of case clauses, or to the <code>default</code> clause,
@@ -6060,7 +6064,7 @@ which are reachable via a <code>fallthrough</code> statement.</p>
    <h4 class="heading settled" data-level="7.4.3" id="loop-statement"><span class="secno">7.4.3. </span><span class="content">Loop Statement</span><a class="self-link" href="#loop-statement"></a></h4>
    <div class="syntax">
      <dfn class="dfn-paneled" data-dfn-for="syntax" data-dfn-type="dfn" data-noexport id="syntax-loop_statement">loop_statement</dfn> : 
-    <p>| <a data-link-type="dfn" href="#syntax-loop" id="ref-for-syntax-loop">loop</a> <a data-link-type="dfn" href="#syntax-brace_left" id="ref-for-syntax-brace_left⑤">brace_left</a> <a data-link-type="dfn" href="#syntax-statement" id="ref-for-syntax-statement②">statement</a> * <a data-link-type="dfn" href="#syntax-continuing_statement" id="ref-for-syntax-continuing_statement">continuing_statement</a> ? <a data-link-type="dfn" href="#syntax-brace_right" id="ref-for-syntax-brace_right⑤">brace_right</a></p>
+    <p>| <a data-link-type="dfn" href="#syntax-loop" id="ref-for-syntax-loop">loop</a> <a data-link-type="dfn" href="#syntax-brace_left" id="ref-for-syntax-brace_left④">brace_left</a> <a data-link-type="dfn" href="#syntax-statement" id="ref-for-syntax-statement②">statement</a> * <a data-link-type="dfn" href="#syntax-continuing_statement" id="ref-for-syntax-continuing_statement">continuing_statement</a> ? <a data-link-type="dfn" href="#syntax-brace_right" id="ref-for-syntax-brace_right④">brace_right</a></p>
    </div>
    <p>A <dfn class="dfn-paneled" data-dfn-for="statement" data-dfn-type="dfn" data-noexport id="statement-loop">loop</dfn> statement repeatedly executes a <dfn data-dfn-type="dfn" data-noexport id="loop-body">loop body<a class="self-link" href="#loop-body"></a></dfn>;
 the loop body is specified as a <a data-link-type="dfn" href="#compound-statement" id="ref-for-compound-statement①">compound statement</a>.
@@ -6235,7 +6239,7 @@ creates a new instance of the variable or constant, and re-initializes it.</p>
      <dfn class="dfn-paneled" data-dfn-for="syntax" data-dfn-type="dfn" data-noexport id="syntax-while_statement">while_statement</dfn> : 
     <p>| <a data-link-type="dfn" href="#syntax-while" id="ref-for-syntax-while">while</a> <a data-link-type="dfn" href="#syntax-expression" id="ref-for-syntax-expression①②">expression</a> <a data-link-type="dfn" href="#syntax-compound_statement" id="ref-for-syntax-compound_statement③">compound_statement</a></p>
    </div>
-   <p>The <dfn data-dfn-for="statement" data-dfn-type="dfn" data-noexport id="statement-while">while<a class="self-link" href="#statement-while"></a></dfn> statement is a kind of loop parameterized by a condition.
+   <p>The <dfn class="dfn-paneled" data-dfn-for="statement" data-dfn-type="dfn" data-noexport id="statement-while">while</dfn> statement is a kind of loop parameterized by a condition.
 At the start of each loop <a data-link-type="dfn" href="#iteration" id="ref-for-iteration②">iteration</a>, a boolean condition is evaluated.
 If the condition is false, the while loop ends execution.
 Otherwise, the rest of the iteration is executed.</p>
@@ -6254,32 +6258,15 @@ The following statement forms are equivalent:</p>
      <dfn class="dfn-paneled" data-dfn-for="syntax" data-dfn-type="dfn" data-noexport id="syntax-break_statement">break_statement</dfn> : 
     <p>| <a data-link-type="dfn" href="#syntax-break" id="ref-for-syntax-break">break</a></p>
    </div>
-   <p>A <dfn class="dfn-paneled" data-dfn-for="statement" data-dfn-type="dfn" data-noexport id="statement-break">break</dfn> statement transfers control to the first statement
-after the body of the nearest-enclosing <a data-link-type="dfn" href="#statement-loop" id="ref-for-statement-loop②">loop</a> or <a data-link-type="dfn" href="#statement-switch" id="ref-for-statement-switch">switch</a> statement.
-A <code>break</code> statement must only be used within <a data-link-type="dfn" href="#statement-loop" id="ref-for-statement-loop③">loop</a>, <a data-link-type="dfn" href="#statement-for" id="ref-for-statement-for①">for</a>, and <a data-link-type="dfn" href="#statement-switch" id="ref-for-statement-switch①">switch</a> statements.</p>
-   <p>When a <code>break</code> statement is placed such that it would exit from a loop’s <a data-link-type="dfn" href="#statement-continuing" id="ref-for-statement-continuing②">continuing</a> statement,
-then:</p>
-   <ul>
-    <li data-md>
-     <p>The <code>break</code> statement must appear as either:</p>
-     <ul>
-      <li data-md>
-       <p>The only statement in the <code>if</code> clause of an <code>if</code> statement that has:</p>
-       <ul>
-        <li data-md>
-         <p>no <code>else</code> clause or an empty <code>else</code> clause</p>
-        <li data-md>
-         <p>no <code>else if</code> clauses</p>
-       </ul>
-      <li data-md>
-       <p>The only statement in the <code>else</code> clause of an <code>if</code> statement that has an empty <code>if</code> clause and no <code>else if</code> clauses.</p>
-     </ul>
-    <li data-md>
-     <p>That <code>if</code> statement must appear last in the <code>continuing</code> clause.</p>
-   </ul>
-   <div class="example wgsl function-scope no-marker" id="example-a2032e86">
-    <a class="self-link" href="#example-a2032e86"></a>
-    <div class="marker">EXAMPLE: WGSL Valid loop if-break from a continuing clause</div>
+   <p>A <dfn class="dfn-paneled" data-dfn-for="statement" data-dfn-type="dfn" data-noexport id="statement-break">break</dfn> statement transfers control to immediately
+after the body of the nearest-enclosing loop
+or <a data-link-type="dfn" href="#statement-switch" id="ref-for-statement-switch">switch</a> statement, thus ending execution of the loop or switch statement.</p>
+   <p>A <code>break</code> statement must only be used within <a data-link-type="dfn" href="#statement-loop" id="ref-for-statement-loop②">loop</a>, <a data-link-type="dfn" href="#statement-for" id="ref-for-statement-for①">for</a>, <a data-link-type="dfn" href="#statement-while" id="ref-for-statement-while">while</a>, and <a data-link-type="dfn" href="#statement-switch" id="ref-for-statement-switch①">switch</a> statements.</p>
+   <p>A <code>break</code> statement must not placed such that it would exit from a loop’s <a href="#continuing-statement">continuing</a> statement.
+Use a <a href="#break-if-statement">break-if</a> statement instead.</p>
+   <div class="example wgsl function-scope no-marker" id="example-58268bcc">
+    <a class="self-link" href="#example-58268bcc"></a>
+    <div class="marker">EXAMPLE: WGSL Invalid loop break from a continuing clause</div>
 <pre>var a: i32 = 2;
 var i: i32 = 0;
 loop {
@@ -6291,14 +6278,22 @@ loop {
 
   continuing {
     i = i + step;
-    if i >= 4 { break; }
+    if i >= 4 { break; } // Invalid.  Use break-if instead.
   }
 }
 </pre>
    </div>
-   <div class="example wgsl function-scope no-marker" id="example-fa33642c">
-    <a class="self-link" href="#example-fa33642c"></a>
-    <div class="marker">EXAMPLE: WGSL Valid loop if-else-break from a continuing clause</div>
+   <h4 class="heading settled" data-level="7.4.7" id="break-if-statement"><span class="secno">7.4.7. </span><span class="content">Break-If Statement</span><a class="self-link" href="#break-if-statement"></a></h4>
+   <div class="syntax">
+     <dfn class="dfn-paneled" data-dfn-for="syntax" data-dfn-type="dfn" data-noexport id="syntax-break_if_statement">break_if_statement</dfn> : 
+    <p>| <a data-link-type="dfn" href="#syntax-break" id="ref-for-syntax-break①">break</a> <a data-link-type="dfn" href="#syntax-if" id="ref-for-syntax-if①">if</a> <a data-link-type="dfn" href="#syntax-expression" id="ref-for-syntax-expression①③">expression</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon④">semicolon</a></p>
+   </div>
+   <p>A <dfn data-dfn-for="statement" data-dfn-type="dfn" data-noexport id="statement-break-if">break-if<a class="self-link" href="#statement-break-if"></a></dfn> statement evaluates a boolean condition;
+If the condition is true, control is transferred to immediately after the body of the nearest-enclosing <a data-link-type="dfn" href="#statement-loop" id="ref-for-statement-loop③">loop</a> statement, ending execution of that loop.</p>
+   <p class="note" role="note"><span>Note:</span> A break-if statement may only appear as the last statement in the body of a <a href="#continuing-statement">continuing</a> statement.</p>
+   <div class="example wgsl function-scope no-marker" id="example-c9adc204">
+    <a class="self-link" href="#example-c9adc204"></a>
+    <div class="marker">EXAMPLE: WGSL Valid loop break-if from a continuing clause</div>
 <pre>var a: i32 = 2;
 var i: i32 = 0;
 loop {
@@ -6310,34 +6305,12 @@ loop {
 
   continuing {
     i = i + step;
-    if i &lt; 4 {} else { break; }
+    break if i >= 4;
   }
 }
 </pre>
    </div>
-   <div class="example wgsl function-scope expect-error no-marker" id="example-8d2c82cc">
-    <a class="self-link" href="#example-8d2c82cc"></a>
-    <div class="marker">EXAMPLE: WGSL Invalid breaks from a continuing clause</div>
-<pre>var a: i32 = 2;
-var i: i32 = 0;
-
-loop {
-  let step: i32 = 1;
-
-  if i % 2 == 0 { continue; }
-
-  a = a * 2;
-
-  continuing {
-    i = i + step;
-    break;                               // Invalid: too early
-    if i &lt; 4 { i++; } else { break; }  // Invalid: if is too complex, and too early
-    if i >= 4 { break; } else { i++; } // Invalid: if is too complex
-  }
-}
-</pre>
-   </div>
-   <h4 class="heading settled" data-level="7.4.7" id="continue-statement"><span class="secno">7.4.7. </span><span class="content">Continue Statement</span><a class="self-link" href="#continue-statement"></a></h4>
+   <h4 class="heading settled" data-level="7.4.8" id="continue-statement"><span class="secno">7.4.8. </span><span class="content">Continue Statement</span><a class="self-link" href="#continue-statement"></a></h4>
    <div class="syntax">
      <dfn class="dfn-paneled" data-dfn-for="syntax" data-dfn-type="dfn" data-noexport id="syntax-continue_statement">continue_statement</dfn> : 
     <p>| <a data-link-type="dfn" href="#syntax-continue" id="ref-for-syntax-continue">continue</a></p>
@@ -6345,16 +6318,16 @@ loop {
    <p>A <dfn data-dfn-for="statement" data-dfn-type="dfn" data-noexport id="statement-continue">continue<a class="self-link" href="#statement-continue"></a></dfn> statement transfers control in the nearest-enclosing <a data-link-type="dfn" href="#statement-loop" id="ref-for-statement-loop④">loop</a>:</p>
    <ul>
     <li data-md>
-     <p>forward to the <a data-link-type="dfn" href="#statement-continuing" id="ref-for-statement-continuing③">continuing</a> statement at the end of the body of that loop, if it exists.</p>
+     <p>forward to the <a data-link-type="dfn" href="#statement-continuing" id="ref-for-statement-continuing②">continuing</a> statement at the end of the body of that loop, if it exists.</p>
     <li data-md>
      <p>otherwise backward to the first statement in the loop body, starting the next <a data-link-type="dfn" href="#iteration" id="ref-for-iteration③">iteration</a>.</p>
    </ul>
    <p>A <code>continue</code> statement must only be used in a <a data-link-type="dfn" href="#statement-loop" id="ref-for-statement-loop⑤">loop</a> or <a data-link-type="dfn" href="#statement-for" id="ref-for-statement-for②">for</a> statement.
 A <code>continue</code> statement must not be placed such that it would transfer
-control to an enclosing <a data-link-type="dfn" href="#statement-continuing" id="ref-for-statement-continuing④">continuing</a> statement.
+control to an enclosing <a data-link-type="dfn" href="#statement-continuing" id="ref-for-statement-continuing③">continuing</a> statement.
 (It is a <em>forward</em> branch when branching to a <code>continuing</code> statement.)</p>
    <p>A <code>continue</code> statement must not be placed such that it would transfer
-control past a declaration used in the targeted <a data-link-type="dfn" href="#statement-continuing" id="ref-for-statement-continuing⑤">continuing</a> statement.</p>
+control past a declaration used in the targeted <a data-link-type="dfn" href="#statement-continuing" id="ref-for-statement-continuing④">continuing</a> statement.</p>
    <div class="example wgsl function-scope expect-error no-marker" id="example-f39a4ef5">
     <a class="self-link" href="#example-f39a4ef5"></a>
     <div class="marker">EXAMPLE: Invalid continue bypasses declaration</div>
@@ -6374,20 +6347,24 @@ loop {
    <ul>
     <li data-md>&lt;3> The <code>continue</code> is invalid because it bypasses the declaration of <code>step</code> used in the <code>continuing</code> construct 
    </ul>
-   <h4 class="heading settled" data-level="7.4.8" id="continuing-statement"><span class="secno">7.4.8. </span><span class="content">Continuing Statement</span><a class="self-link" href="#continuing-statement"></a></h4>
+   <h4 class="heading settled" data-level="7.4.9" id="continuing-statement"><span class="secno">7.4.9. </span><span class="content">Continuing Statement</span><a class="self-link" href="#continuing-statement"></a></h4>
    <div class="syntax">
      <dfn class="dfn-paneled" data-dfn-for="syntax" data-dfn-type="dfn" data-noexport id="syntax-continuing_statement">continuing_statement</dfn> : 
-    <p>| <a data-link-type="dfn" href="#syntax-continuing" id="ref-for-syntax-continuing">continuing</a> <a data-link-type="dfn" href="#syntax-compound_statement" id="ref-for-syntax-compound_statement④">compound_statement</a></p>
+    <p>| <a data-link-type="dfn" href="#syntax-continuing" id="ref-for-syntax-continuing">continuing</a> <a data-link-type="dfn" href="#syntax-continuing_compound_statement" id="ref-for-syntax-continuing_compound_statement①">continuing_compound_statement</a></p>
+   </div>
+   <div class="syntax">
+     <dfn class="dfn-paneled" data-dfn-for="syntax" data-dfn-type="dfn" data-noexport id="syntax-continuing_compound_statement">continuing_compound_statement</dfn> : 
+    <p>| <a data-link-type="dfn" href="#syntax-brace_left" id="ref-for-syntax-brace_left⑤">brace_left</a> <a data-link-type="dfn" href="#syntax-statement" id="ref-for-syntax-statement③">statement</a> * <a data-link-type="dfn" href="#syntax-break_if_statement" id="ref-for-syntax-break_if_statement">break_if_statement</a> ? <a data-link-type="dfn" href="#syntax-brace_right" id="ref-for-syntax-brace_right⑤">brace_right</a></p>
    </div>
    <p>A <dfn class="dfn-paneled" data-dfn-for="statement" data-dfn-type="dfn" data-noexport id="statement-continuing">continuing</dfn> statement specifies a <a data-link-type="dfn" href="#compound-statement" id="ref-for-compound-statement③">compound statement</a> to be executed at the end of a loop <a data-link-type="dfn" href="#iteration" id="ref-for-iteration④">iteration</a>.
 The construct is optional.</p>
    <p>The compound statement must not contain a <a data-link-type="dfn" href="#statement-return" id="ref-for-statement-return①">return</a> at any compound statement nesting level.</p>
    <p>The compound statement must not contain a <a data-link-type="dfn" href="#statement-discard" id="ref-for-statement-discard①">discard</a> at any compound statement nesting level nor through function calls.
 See <a href="#behaviors">§ 7.7 Statements Behavior Analysis</a> for a more formal description of this rule.</p>
-   <h4 class="heading settled" data-level="7.4.9" id="return-statement"><span class="secno">7.4.9. </span><span class="content">Return Statement</span><a class="self-link" href="#return-statement"></a></h4>
+   <h4 class="heading settled" data-level="7.4.10" id="return-statement"><span class="secno">7.4.10. </span><span class="content">Return Statement</span><a class="self-link" href="#return-statement"></a></h4>
    <div class="syntax">
      <dfn class="dfn-paneled" data-dfn-for="syntax" data-dfn-type="dfn" data-noexport id="syntax-return_statement">return_statement</dfn> : 
-    <p>| <a data-link-type="dfn" href="#syntax-return" id="ref-for-syntax-return">return</a> <a data-link-type="dfn" href="#syntax-expression" id="ref-for-syntax-expression①③">expression</a> ?</p>
+    <p>| <a data-link-type="dfn" href="#syntax-return" id="ref-for-syntax-return">return</a> <a data-link-type="dfn" href="#syntax-expression" id="ref-for-syntax-expression①④">expression</a> ?</p>
    </div>
    <p>A <dfn class="dfn-paneled" data-dfn-for="statement" data-dfn-type="dfn" data-noexport id="statement-return">return</dfn> statement ends execution of the current function.
 If the function is an <a data-link-type="dfn" href="#entry-point" id="ref-for-entry-point③">entry point</a>, then the current shader invocation
@@ -6400,7 +6377,7 @@ supply a value.
 Otherwise the expression must be present, and is called the <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="return-value">return value</dfn>.
 In this case the call site of this function invocation evaluates to the return value.
 The type of the return value must match the return type of the function.</p>
-   <h4 class="heading settled" data-level="7.4.10" id="discard-statement"><span class="secno">7.4.10. </span><span class="content">Discard Statement</span><a class="self-link" href="#discard-statement"></a></h4>
+   <h4 class="heading settled" data-level="7.4.11" id="discard-statement"><span class="secno">7.4.11. </span><span class="content">Discard Statement</span><a class="self-link" href="#discard-statement"></a></h4>
    <p>A <dfn class="dfn-paneled" data-dfn-for="statement" data-dfn-type="dfn" data-noexport id="statement-discard">discard</dfn> statement immediately ends execution of a fragment shader invocation and throws away the fragment.
 The <code>discard</code> statement must only be used in a <a data-link-type="dfn" href="#fragment" id="ref-for-fragment①">fragment</a> shader stage.</p>
    <p>More precisely, executing a <code>discard</code> statement will:</p>
@@ -6453,25 +6430,37 @@ fn main(@builtin(position) coord_in: vec4&lt;f32>)
    <p>A function call statement executes a <a data-link-type="dfn" href="#function-call" id="ref-for-function-call①">function call</a>.</p>
    <p class="note" role="note"><span>Note:</span> If the function <a data-link-type="dfn" href="#return-value" id="ref-for-return-value②">returns a value</a>, that value is ignored.</p>
    <h3 class="heading settled" data-level="7.6" id="statements-summary"><span class="secno">7.6. </span><span class="content">Statements Grammar Summary</span><a class="self-link" href="#statements-summary"></a></h3>
+   <p>The <a data-link-type="dfn" href="#syntax-statement" id="ref-for-syntax-statement④">statement</a> rule matches statements that can be used in most places inside a function body.</p>
    <div class="syntax">
      <dfn class="dfn-paneled" data-dfn-for="syntax" data-dfn-type="dfn" data-noexport id="syntax-statement">statement</dfn> : 
-    <p>| <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon④">semicolon</a></p>
-    <p>| <a data-link-type="dfn" href="#syntax-return_statement" id="ref-for-syntax-return_statement">return_statement</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon⑤">semicolon</a></p>
+    <p>| <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon⑤">semicolon</a></p>
+    <p>| <a data-link-type="dfn" href="#syntax-return_statement" id="ref-for-syntax-return_statement">return_statement</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon⑥">semicolon</a></p>
     <p>| <a data-link-type="dfn" href="#syntax-if_statement" id="ref-for-syntax-if_statement①">if_statement</a></p>
     <p>| <a data-link-type="dfn" href="#syntax-switch_statement" id="ref-for-syntax-switch_statement">switch_statement</a></p>
     <p>| <a data-link-type="dfn" href="#syntax-loop_statement" id="ref-for-syntax-loop_statement">loop_statement</a></p>
     <p>| <a data-link-type="dfn" href="#syntax-for_statement" id="ref-for-syntax-for_statement">for_statement</a></p>
     <p>| <a data-link-type="dfn" href="#syntax-while_statement" id="ref-for-syntax-while_statement">while_statement</a></p>
-    <p>| <a data-link-type="dfn" href="#syntax-func_call_statement" id="ref-for-syntax-func_call_statement②">func_call_statement</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon⑥">semicolon</a></p>
-    <p>| <a data-link-type="dfn" href="#syntax-variable_statement" id="ref-for-syntax-variable_statement①">variable_statement</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon⑦">semicolon</a></p>
-    <p>| <a data-link-type="dfn" href="#syntax-break_statement" id="ref-for-syntax-break_statement">break_statement</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon⑧">semicolon</a></p>
-    <p>| <a data-link-type="dfn" href="#syntax-continue_statement" id="ref-for-syntax-continue_statement">continue_statement</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon⑨">semicolon</a></p>
-    <p>| <a data-link-type="dfn" href="#syntax-discard" id="ref-for-syntax-discard">discard</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon①⓪">semicolon</a></p>
-    <p>| <a data-link-type="dfn" href="#syntax-assignment_statement" id="ref-for-syntax-assignment_statement②">assignment_statement</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon①①">semicolon</a></p>
-    <p>| <a data-link-type="dfn" href="#syntax-compound_statement" id="ref-for-syntax-compound_statement⑤">compound_statement</a></p>
-    <p>| <a data-link-type="dfn" href="#syntax-increment_statement" id="ref-for-syntax-increment_statement①">increment_statement</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon①②">semicolon</a></p>
-    <p>| <a data-link-type="dfn" href="#syntax-decrement_statement" id="ref-for-syntax-decrement_statement①">decrement_statement</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon①③">semicolon</a></p>
+    <p>| <a data-link-type="dfn" href="#syntax-func_call_statement" id="ref-for-syntax-func_call_statement②">func_call_statement</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon⑦">semicolon</a></p>
+    <p>| <a data-link-type="dfn" href="#syntax-variable_statement" id="ref-for-syntax-variable_statement①">variable_statement</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon⑧">semicolon</a></p>
+    <p>| <a data-link-type="dfn" href="#syntax-break_statement" id="ref-for-syntax-break_statement">break_statement</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon⑨">semicolon</a></p>
+    <p>| <a data-link-type="dfn" href="#syntax-continue_statement" id="ref-for-syntax-continue_statement">continue_statement</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon①⓪">semicolon</a></p>
+    <p>| <a data-link-type="dfn" href="#syntax-discard" id="ref-for-syntax-discard">discard</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon①①">semicolon</a></p>
+    <p>| <a data-link-type="dfn" href="#syntax-assignment_statement" id="ref-for-syntax-assignment_statement②">assignment_statement</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon①②">semicolon</a></p>
+    <p>| <a data-link-type="dfn" href="#syntax-compound_statement" id="ref-for-syntax-compound_statement④">compound_statement</a></p>
+    <p>| <a data-link-type="dfn" href="#syntax-increment_statement" id="ref-for-syntax-increment_statement①">increment_statement</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon①③">semicolon</a></p>
+    <p>| <a data-link-type="dfn" href="#syntax-decrement_statement" id="ref-for-syntax-decrement_statement①">decrement_statement</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon①④">semicolon</a></p>
    </div>
+   <p>Additionally, certain statements may only be used in very specific contexts:</p>
+   <ul>
+    <li data-md>
+     <p><a data-link-type="dfn" href="#syntax-break_if_statement" id="ref-for-syntax-break_if_statement①">break_if_statement</a></p>
+    <li data-md>
+     <p><a data-link-type="dfn" href="#syntax-case_compound_statement" id="ref-for-syntax-case_compound_statement③">case_compound_statement</a></p>
+    <li data-md>
+     <p><a data-link-type="dfn" href="#syntax-continuing_compound_statement" id="ref-for-syntax-continuing_compound_statement②">continuing_compound_statement</a></p>
+    <li data-md>
+     <p><a data-link-type="dfn" href="#syntax-fallthrough_statement" id="ref-for-syntax-fallthrough_statement②">fallthrough_statement</a></p>
+   </ul>
    <h3 class="heading settled" data-level="7.7" id="behaviors"><span class="secno">7.7. </span><span class="content">Statements Behavior Analysis</span><a class="self-link" href="#behaviors"></a></h3>
    <h4 class="heading settled" data-level="7.7.1" id="behaviors-rules"><span class="secno">7.7.1. </span><span class="content">Rules</span><a class="self-link" href="#behaviors-rules"></a></h4>
    <p>Some statements affecting control-flow are only valid in some contexts.
@@ -6573,6 +6562,10 @@ The reason is that only functions without a return type can have such a <a data-
       <td>break; 
       <td>
       <td>{Break} 
+     <tr class="algorithm" data-algorithm="break if behavior">
+      <td>break if <var>e</var>; 
+      <td class="nowrap"><var>e</var>: <var>B</var> 
+      <td><var>B</var> ∪ {Break} 
      <tr class="algorithm" data-algorithm="continue behavior">
       <td>continue; 
       <td>
@@ -6929,7 +6922,7 @@ Two formal parameters for a given function must not have the same name.</p>
    <p>The return type, if specified, must be <a data-link-type="dfn" href="#constructible" id="ref-for-constructible②③">constructible</a>.</p>
    <div class="syntax">
      <dfn class="dfn-paneled" data-dfn-for="syntax" data-dfn-type="dfn" data-noexport id="syntax-function_decl">function_decl</dfn> : 
-    <p>| <a data-link-type="dfn" href="#syntax-attribute" id="ref-for-syntax-attribute③">attribute</a> * <a data-link-type="dfn" href="#syntax-function_header" id="ref-for-syntax-function_header">function_header</a> <a data-link-type="dfn" href="#syntax-compound_statement" id="ref-for-syntax-compound_statement⑥">compound_statement</a></p>
+    <p>| <a data-link-type="dfn" href="#syntax-attribute" id="ref-for-syntax-attribute③">attribute</a> * <a data-link-type="dfn" href="#syntax-function_header" id="ref-for-syntax-function_header">function_header</a> <a data-link-type="dfn" href="#syntax-compound_statement" id="ref-for-syntax-compound_statement⑤">compound_statement</a></p>
    </div>
    <div class="syntax">
      <dfn class="dfn-paneled" data-dfn-for="syntax" data-dfn-type="dfn" data-noexport id="syntax-function_header">function_header</dfn> : 
@@ -7600,7 +7593,7 @@ Use of the identifier by the directive does not conflict with the
 use of that identifier as the name in any <a data-link-type="dfn" href="#declaration" id="ref-for-declaration⑧">declaration</a>.</p>
    <div class="syntax">
      <dfn class="dfn-paneled" data-dfn-for="syntax" data-dfn-type="dfn" data-noexport id="syntax-enable_directive">enable_directive</dfn> : 
-    <p>| <a data-link-type="dfn" href="#syntax-enable" id="ref-for-syntax-enable">enable</a> <a data-link-type="dfn" href="#syntax-ident" id="ref-for-syntax-ident①⑦">ident</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon①④">semicolon</a></p>
+    <p>| <a data-link-type="dfn" href="#syntax-enable" id="ref-for-syntax-enable">enable</a> <a data-link-type="dfn" href="#syntax-ident" id="ref-for-syntax-ident①⑦">ident</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon①⑤">semicolon</a></p>
    </div>
    <p class="note" role="note"><span>Note:</span> The grammar rule includes the terminating semicolon token,
 ensuring the additional functionality is usable only after that semicolon.
@@ -7641,10 +7634,10 @@ fn triple_it(x: f16) -> f16 {
    </div>
    <div class="syntax">
      <dfn class="dfn-paneled" data-dfn-for="syntax" data-dfn-type="dfn" data-noexport id="syntax-global_decl">global_decl</dfn> : 
-    <p>| <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon①⑤">semicolon</a></p>
-    <p>| <a data-link-type="dfn" href="#syntax-global_variable_decl" id="ref-for-syntax-global_variable_decl">global_variable_decl</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon①⑥">semicolon</a></p>
-    <p>| <a data-link-type="dfn" href="#syntax-global_constant_decl" id="ref-for-syntax-global_constant_decl">global_constant_decl</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon①⑦">semicolon</a></p>
-    <p>| <a data-link-type="dfn" href="#syntax-type_alias_decl" id="ref-for-syntax-type_alias_decl">type_alias_decl</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon①⑧">semicolon</a></p>
+    <p>| <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon①⑥">semicolon</a></p>
+    <p>| <a data-link-type="dfn" href="#syntax-global_variable_decl" id="ref-for-syntax-global_variable_decl">global_variable_decl</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon①⑦">semicolon</a></p>
+    <p>| <a data-link-type="dfn" href="#syntax-global_constant_decl" id="ref-for-syntax-global_constant_decl">global_constant_decl</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon①⑧">semicolon</a></p>
+    <p>| <a data-link-type="dfn" href="#syntax-type_alias_decl" id="ref-for-syntax-type_alias_decl">type_alias_decl</a> <a data-link-type="dfn" href="#syntax-semicolon" id="ref-for-syntax-semicolon①⑨">semicolon</a></p>
     <p>| <a data-link-type="dfn" href="#syntax-struct_decl" id="ref-for-syntax-struct_decl">struct_decl</a></p>
     <p>| <a data-link-type="dfn" href="#syntax-function_decl" id="ref-for-syntax-function_decl">function_decl</a></p>
    </div>
@@ -7884,14 +7877,24 @@ Similarly, <code>(CF1, E) => (CF2, V)</code> means "run the analysis on expressi
       <td class="nowrap"><em>CFend</em> -> {<em>CF_1</em>, ..., <em>CF_n</em>} 
      <tr>
       <td class="nowrap">var x: T; 
-      <td rowspan="5">
-      <td rowspan="5">
-      <td rowspan="5"><em>CF</em> 
-      <td rowspan="5">
+      <td rowspan="2">
+      <td rowspan="2">
+      <td rowspan="2"><em>CF</em> 
+      <td rowspan="2">
      <tr>
       <td class="nowrap">break; 
      <tr>
+      <td class="nowrap">break if <em>e</em>; 
+      <td>
+      <td class="nowrap">(<em>CF</em>, <em>e</em>) => (<em>CF'</em>, <em>V</em>) 
+      <td><em>CF'</em> 
+      <td>
+     <tr>
       <td class="nowrap">continue; 
+      <td rowspan="3">
+      <td rowspan="3">
+      <td rowspan="3"><em>CF</em> 
+      <td rowspan="3">
      <tr>
       <td class="nowrap">fallthrough; 
      <tr>
@@ -8013,7 +8016,7 @@ from their respective desugaring translations to <a href="#loop-statement">loop<
       <td class="nowrap"><em>CF</em>, <em>CF</em> 
       <td>
      <tr>
-      <td class="nowrap">reference to function-scope variable, let-declaration, or non-built-in parameter "x" 
+      <td>reference to function-scope variable, let-declaration, or non-built-in parameter "x" 
       <td><em>Result</em> 
       <td class="nowrap"><em>X</em> is the node corresponding to "x" 
       <td class="nowrap"><em>CF</em>, <em>Result</em> 
@@ -8043,7 +8046,7 @@ from their respective desugaring translations to <a href="#loop-statement">loop<
       <td class="nowrap"><em>CF</em>, <em>MayBeNonUniform</em> 
       <td>
      <tr>
-      <td class="nowrap">op <em>e</em>, where "op" is a unary operator 
+      <td class="nowrap"><em>op</em> <em>e</em>,<br> where <em>op</em> is a unary operator 
       <td rowspan="2">
       <td class="nowrap" rowspan="2">(<em>CF</em>, <em>e</em>) => (<em>CF'</em>, <em>V</em>) 
       <td class="nowrap" rowspan="2"><em>CF'</em>, <em>V</em> 
@@ -8051,7 +8054,7 @@ from their respective desugaring translations to <a href="#loop-statement">loop<
      <tr>
       <td class="nowrap"><em>e</em>.field 
      <tr>
-      <td class="nowrap"><em>e1</em> op <em>e2</em>, where op is a non-short-circuiting binary operator 
+      <td><em>e1</em> <em>op</em> <em>e2</em>,<br> where <em>op</em> is a non-short-circuiting binary operator 
       <td rowspan="2"> <em>Result</em> 
       <td class="nowrap" rowspan="2">(<em>CF</em>, <em>e1</em>) => (<em>CF1</em>, <em>V1</em>)<br> (<em>CF1</em>, <em>e2</em>) => (<em>CF2</em>, <em>V2</em>) 
       <td class="nowrap" rowspan="2"><em>CF2</em>, <em>Result</em> 
@@ -8078,7 +8081,7 @@ from their respective desugaring translations to <a href="#loop-statement">loop<
       <th>New edges 
     <tbody>
      <tr>
-      <td class="nowrap">reference to function-scope variable, let-declaration, or parameter "x" 
+      <td>reference to function-scope variable, let-declaration, or parameter "x" 
       <td>
       <td class="nowrap"><em>X</em> is the node corresponding to "x" 
       <td class="nowrap"><em>CF</em>, <em>X</em> 
@@ -8362,14 +8365,23 @@ value with the same sign.</p>
       <td><code>acos(x)</code>
       <td>Inherited from <code>atan2(sqrt(1.0 - x * x), x)</code> 
      <tr>
+      <td><code>acosh(x)</code>
+      <td>Inherited from <code>log(x + sqrt(x * x - 1.0))</code> 
+     <tr>
       <td><code>asin(x)</code>
       <td>Inherited from <code>atan2(x, sqrt(1.0 - x * x))</code> 
+     <tr>
+      <td><code>asinh(x)</code>
+      <td>Inherited from <code>log(x + sqrt(x * x + 1.0))</code> 
      <tr>
       <td><code>atan(x)</code>
       <td>4096 ULP 
      <tr>
       <td><code>atan2(y, x)</code>
       <td>4096 ULP 
+     <tr>
+      <td><code>atanh(x)</code>
+      <td>Inherited from <code>log( (1.0 + x) / (1.0 - x) ) * 0.5</code> 
      <tr>
       <td><code>ceil(x)</code>
       <td>Correctly rounded 
@@ -8964,32 +8976,584 @@ A WGSL program must not contain a reserved word.</p>
    <p>The following are reserved words:</p>
    <div class="syntax">
      <dfn data-dfn-for="syntax" data-dfn-type="dfn" data-noexport id="syntax-_reserved">_reserved<a class="self-link" href="#syntax-_reserved"></a></dfn> : 
+    <p>| <code>'AppendStructuredBuffer'</code></p>
+    <p>| <code>'BlendState'</code></p>
+    <p>| <code>'Buffer'</code></p>
+    <p>| <code>'ByteAddressBuffer'</code></p>
+    <p>| <code>'CompileShader'</code></p>
+    <p>| <code>'ComputeShader'</code></p>
+    <p>| <code>'ConsumeStructuredBuffer'</code></p>
+    <p>| <code>'DepthStencilState'</code></p>
+    <p>| <code>'DepthStencilView'</code></p>
+    <p>| <code>'DomainShader'</code></p>
+    <p>| <code>'GeometryShader'</code></p>
+    <p>| <code>'Hullshader'</code></p>
+    <p>| <code>'InputPatch'</code></p>
+    <p>| <code>'LineStream'</code></p>
+    <p>| <code>'NULL'</code></p>
+    <p>| <code>'OutputPatch'</code></p>
+    <p>| <code>'PixelShader'</code></p>
+    <p>| <code>'PointStream'</code></p>
+    <p>| <code>'RWBuffer'</code></p>
+    <p>| <code>'RWByteAddressBuffer'</code></p>
+    <p>| <code>'RWStructuredBuffer'</code></p>
+    <p>| <code>'RWTexture1D'</code></p>
+    <p>| <code>'RWTexture1DArray'</code></p>
+    <p>| <code>'RWTexture2D'</code></p>
+    <p>| <code>'RWTexture2DArray'</code></p>
+    <p>| <code>'RWTexture3D'</code></p>
+    <p>| <code>'RasterizerState'</code></p>
+    <p>| <code>'RenderTargetView'</code></p>
+    <p>| <code>'SamplerComparisonState'</code></p>
+    <p>| <code>'SamplerState'</code></p>
+    <p>| <code>'Self'</code></p>
+    <p>| <code>'StructuredBuffer'</code></p>
+    <p>| <code>'Texture1D'</code></p>
+    <p>| <code>'Texture1DArray'</code></p>
+    <p>| <code>'Texture2D'</code></p>
+    <p>| <code>'Texture2DArray'</code></p>
+    <p>| <code>'Texture2DMS'</code></p>
+    <p>| <code>'Texture2DMSArray'</code></p>
+    <p>| <code>'Texture3D'</code></p>
+    <p>| <code>'TextureCube'</code></p>
+    <p>| <code>'TextureCubeArray'</code></p>
+    <p>| <code>'TriangleStream'</code></p>
+    <p>| <code>'VertexShader'</code></p>
+    <p>| <code>'abstract'</code></p>
+    <p>| <code>'active'</code></p>
+    <p>| <code>'alignas'</code></p>
+    <p>| <code>'alignof'</code></p>
+    <p>| <code>'as'</code></p>
     <p>| <code>'asm'</code></p>
+    <p>| <code>'asm_fragment'</code></p>
+    <p>| <code>'async'</code></p>
+    <p>| <code>'atomic_uint'</code></p>
+    <p>| <code>'attribute'</code></p>
+    <p>| <code>'auto'</code></p>
+    <p>| <code>'await'</code></p>
+    <p>| <code>'become'</code></p>
     <p>| <code>'bf16'</code></p>
+    <p>| <code>'bool1'</code></p>
+    <p>| <code>'bool1x1'</code></p>
+    <p>| <code>'bool1x2'</code></p>
+    <p>| <code>'bool1x3'</code></p>
+    <p>| <code>'bool1x4'</code></p>
+    <p>| <code>'bool2'</code></p>
+    <p>| <code>'bool2x1'</code></p>
+    <p>| <code>'bool2x2'</code></p>
+    <p>| <code>'bool2x3'</code></p>
+    <p>| <code>'bool2x4'</code></p>
+    <p>| <code>'bool3'</code></p>
+    <p>| <code>'bool3x1'</code></p>
+    <p>| <code>'bool3x2'</code></p>
+    <p>| <code>'bool3x3'</code></p>
+    <p>| <code>'bool3x4'</code></p>
+    <p>| <code>'bool4'</code></p>
+    <p>| <code>'bool4x1'</code></p>
+    <p>| <code>'bool4x2'</code></p>
+    <p>| <code>'bool4x3'</code></p>
+    <p>| <code>'bool4x4'</code></p>
+    <p>| <code>'box'</code></p>
+    <p>| <code>'buffer'</code></p>
+    <p>| <code>'bvec2'</code></p>
+    <p>| <code>'bvec3'</code></p>
+    <p>| <code>'bvec4'</code></p>
+    <p>| <code>'cast'</code></p>
+    <p>| <code>'catch'</code></p>
+    <p>| <code>'cbuffer'</code></p>
+    <p>| <code>'centroid'</code></p>
+    <p>| <code>'char'</code></p>
+    <p>| <code>'char16_t'</code></p>
+    <p>| <code>'char32_t'</code></p>
+    <p>| <code>'char8_t'</code></p>
+    <p>| <code>'class'</code></p>
+    <p>| <code>'co_await'</code></p>
+    <p>| <code>'co_return'</code></p>
+    <p>| <code>'co_yield'</code></p>
+    <p>| <code>'coherent'</code></p>
+    <p>| <code>'column_major'</code></p>
+    <p>| <code>'common'</code></p>
+    <p>| <code>'compile'</code></p>
+    <p>| <code>'compile_fragment'</code></p>
+    <p>| <code>'concept'</code></p>
     <p>| <code>'const'</code></p>
+    <p>| <code>'const_cast'</code></p>
+    <p>| <code>'consteval'</code></p>
+    <p>| <code>'constexpr'</code></p>
+    <p>| <code>'constinit'</code></p>
+    <p>| <code>'crate'</code></p>
+    <p>| <code>'debugger'</code></p>
+    <p>| <code>'decltype'</code></p>
+    <p>| <code>'delete'</code></p>
     <p>| <code>'demote'</code></p>
     <p>| <code>'demote_to_helper'</code></p>
+    <p>| <code>'dmat2'</code></p>
+    <p>| <code>'dmat2x2'</code></p>
+    <p>| <code>'dmat2x3'</code></p>
+    <p>| <code>'dmat2x4'</code></p>
+    <p>| <code>'dmat3'</code></p>
+    <p>| <code>'dmat3x2'</code></p>
+    <p>| <code>'dmat3x3'</code></p>
+    <p>| <code>'dmat3x4'</code></p>
+    <p>| <code>'dmat4'</code></p>
+    <p>| <code>'dmat4x2'</code></p>
+    <p>| <code>'dmat4x3'</code></p>
+    <p>| <code>'dmat4x4'</code></p>
     <p>| <code>'do'</code></p>
+    <p>| <code>'double'</code></p>
+    <p>| <code>'dvec2'</code></p>
+    <p>| <code>'dvec3'</code></p>
+    <p>| <code>'dvec4'</code></p>
+    <p>| <code>'dword'</code></p>
+    <p>| <code>'dynamic_cast'</code></p>
     <p>| <code>'enum'</code></p>
+    <p>| <code>'explicit'</code></p>
+    <p>| <code>'export'</code></p>
+    <p>| <code>'extends'</code></p>
+    <p>| <code>'extern'</code></p>
+    <p>| <code>'external'</code></p>
     <p>| <code>'f16'</code></p>
     <p>| <code>'f64'</code></p>
+    <p>| <code>'filter'</code></p>
+    <p>| <code>'final'</code></p>
+    <p>| <code>'finally'</code></p>
+    <p>| <code>'fixed'</code></p>
+    <p>| <code>'flat'</code></p>
+    <p>| <code>'float'</code></p>
+    <p>| <code>'float1'</code></p>
+    <p>| <code>'float1x1'</code></p>
+    <p>| <code>'float1x2'</code></p>
+    <p>| <code>'float1x3'</code></p>
+    <p>| <code>'float1x4'</code></p>
+    <p>| <code>'float2'</code></p>
+    <p>| <code>'float2x1'</code></p>
+    <p>| <code>'float2x2'</code></p>
+    <p>| <code>'float2x3'</code></p>
+    <p>| <code>'float2x4'</code></p>
+    <p>| <code>'float3'</code></p>
+    <p>| <code>'float3x1'</code></p>
+    <p>| <code>'float3x2'</code></p>
+    <p>| <code>'float3x3'</code></p>
+    <p>| <code>'float3x4'</code></p>
+    <p>| <code>'float4'</code></p>
+    <p>| <code>'float4x1'</code></p>
+    <p>| <code>'float4x2'</code></p>
+    <p>| <code>'float4x3'</code></p>
+    <p>| <code>'float4x4'</code></p>
+    <p>| <code>'friend'</code></p>
+    <p>| <code>'from'</code></p>
+    <p>| <code>'fvec2'</code></p>
+    <p>| <code>'fvec3'</code></p>
+    <p>| <code>'fvec4'</code></p>
+    <p>| <code>'fxgroup'</code></p>
+    <p>| <code>'get'</code></p>
+    <p>| <code>'goto'</code></p>
+    <p>| <code>'groupshared'</code></p>
+    <p>| <code>'half'</code></p>
     <p>| <code>'handle'</code></p>
-    <p>| <code>'i8'</code></p>
+    <p>| <code>'highp'</code></p>
+    <p>| <code>'hvec2'</code></p>
+    <p>| <code>'hvec3'</code></p>
+    <p>| <code>'hvec4'</code></p>
     <p>| <code>'i16'</code></p>
     <p>| <code>'i64'</code></p>
+    <p>| <code>'i8'</code></p>
+    <p>| <code>'iimage1D'</code></p>
+    <p>| <code>'iimage1DArray'</code></p>
+    <p>| <code>'iimage2D'</code></p>
+    <p>| <code>'iimage2DArray'</code></p>
+    <p>| <code>'iimage2DMS'</code></p>
+    <p>| <code>'iimage2DMSArray'</code></p>
+    <p>| <code>'iimage2DRect'</code></p>
+    <p>| <code>'iimage3D'</code></p>
+    <p>| <code>'iimageBuffer'</code></p>
+    <p>| <code>'iimageCube'</code></p>
+    <p>| <code>'iimageCubeArray'</code></p>
+    <p>| <code>'image1D'</code></p>
+    <p>| <code>'image1DArray'</code></p>
+    <p>| <code>'image2D'</code></p>
+    <p>| <code>'image2DArray'</code></p>
+    <p>| <code>'image2DMS'</code></p>
+    <p>| <code>'image2DMSArray'</code></p>
+    <p>| <code>'image2DRect'</code></p>
+    <p>| <code>'image3D'</code></p>
+    <p>| <code>'imageBuffer'</code></p>
+    <p>| <code>'imageCube'</code></p>
+    <p>| <code>'imageCubeArray'</code></p>
+    <p>| <code>'impl'</code></p>
+    <p>| <code>'implements'</code></p>
+    <p>| <code>'import'</code></p>
+    <p>| <code>'in'</code></p>
+    <p>| <code>'inline'</code></p>
+    <p>| <code>'inout'</code></p>
+    <p>| <code>'input'</code></p>
+    <p>| <code>'instanceof'</code></p>
+    <p>| <code>'int'</code></p>
+    <p>| <code>'int1'</code></p>
+    <p>| <code>'int1x1'</code></p>
+    <p>| <code>'int1x2'</code></p>
+    <p>| <code>'int1x3'</code></p>
+    <p>| <code>'int1x4'</code></p>
+    <p>| <code>'int2'</code></p>
+    <p>| <code>'int2x1'</code></p>
+    <p>| <code>'int2x2'</code></p>
+    <p>| <code>'int2x3'</code></p>
+    <p>| <code>'int2x4'</code></p>
+    <p>| <code>'int3'</code></p>
+    <p>| <code>'int3x1'</code></p>
+    <p>| <code>'int3x2'</code></p>
+    <p>| <code>'int3x3'</code></p>
+    <p>| <code>'int3x4'</code></p>
+    <p>| <code>'int4'</code></p>
+    <p>| <code>'int4x1'</code></p>
+    <p>| <code>'int4x2'</code></p>
+    <p>| <code>'int4x3'</code></p>
+    <p>| <code>'int4x4'</code></p>
+    <p>| <code>'interface'</code></p>
+    <p>| <code>'invariant'</code></p>
+    <p>| <code>'isampler1D'</code></p>
+    <p>| <code>'isampler1DArray'</code></p>
+    <p>| <code>'isampler2D'</code></p>
+    <p>| <code>'isampler2DArray'</code></p>
+    <p>| <code>'isampler2DMS'</code></p>
+    <p>| <code>'isampler2DMSArray'</code></p>
+    <p>| <code>'isampler2DRect'</code></p>
+    <p>| <code>'isampler3D'</code></p>
+    <p>| <code>'isamplerBuffer'</code></p>
+    <p>| <code>'isamplerCube'</code></p>
+    <p>| <code>'isamplerCubeArray'</code></p>
+    <p>| <code>'isubpassInput'</code></p>
+    <p>| <code>'isubpassInputMS'</code></p>
+    <p>| <code>'itexture1D'</code></p>
+    <p>| <code>'itexture1DArray'</code></p>
+    <p>| <code>'itexture2D'</code></p>
+    <p>| <code>'itexture2DArray'</code></p>
+    <p>| <code>'itexture2DMS'</code></p>
+    <p>| <code>'itexture2DMSArray'</code></p>
+    <p>| <code>'itexture2DRect'</code></p>
+    <p>| <code>'itexture3D'</code></p>
+    <p>| <code>'itextureBuffer'</code></p>
+    <p>| <code>'itextureCube'</code></p>
+    <p>| <code>'itextureCubeArray'</code></p>
+    <p>| <code>'ivec2'</code></p>
+    <p>| <code>'ivec3'</code></p>
+    <p>| <code>'ivec4'</code></p>
+    <p>| <code>'layout'</code></p>
+    <p>| <code>'line'</code></p>
+    <p>| <code>'lineadj'</code></p>
+    <p>| <code>'linear'</code></p>
+    <p>| <code>'long'</code></p>
+    <p>| <code>'lowp'</code></p>
+    <p>| <code>'macro'</code></p>
+    <p>| <code>'macro_rules'</code></p>
     <p>| <code>'mat'</code></p>
+    <p>| <code>'mat2'</code></p>
+    <p>| <code>'mat3'</code></p>
+    <p>| <code>'mat4'</code></p>
+    <p>| <code>'match'</code></p>
+    <p>| <code>'matrix'</code></p>
+    <p>| <code>'mediump'</code></p>
+    <p>| <code>'meta'</code></p>
+    <p>| <code>'min10float'</code></p>
+    <p>| <code>'min10float1'</code></p>
+    <p>| <code>'min10float1x1'</code></p>
+    <p>| <code>'min10float1x2'</code></p>
+    <p>| <code>'min10float1x3'</code></p>
+    <p>| <code>'min10float1x4'</code></p>
+    <p>| <code>'min10float2'</code></p>
+    <p>| <code>'min10float2x1'</code></p>
+    <p>| <code>'min10float2x2'</code></p>
+    <p>| <code>'min10float2x3'</code></p>
+    <p>| <code>'min10float2x4'</code></p>
+    <p>| <code>'min10float3'</code></p>
+    <p>| <code>'min10float3x1'</code></p>
+    <p>| <code>'min10float3x2'</code></p>
+    <p>| <code>'min10float3x3'</code></p>
+    <p>| <code>'min10float3x4'</code></p>
+    <p>| <code>'min10float4'</code></p>
+    <p>| <code>'min10float4x1'</code></p>
+    <p>| <code>'min10float4x2'</code></p>
+    <p>| <code>'min10float4x3'</code></p>
+    <p>| <code>'min10float4x4'</code></p>
+    <p>| <code>'min12int'</code></p>
+    <p>| <code>'min12int1'</code></p>
+    <p>| <code>'min12int1x1'</code></p>
+    <p>| <code>'min12int1x2'</code></p>
+    <p>| <code>'min12int1x3'</code></p>
+    <p>| <code>'min12int1x4'</code></p>
+    <p>| <code>'min12int2'</code></p>
+    <p>| <code>'min12int2x1'</code></p>
+    <p>| <code>'min12int2x2'</code></p>
+    <p>| <code>'min12int2x3'</code></p>
+    <p>| <code>'min12int2x4'</code></p>
+    <p>| <code>'min12int3'</code></p>
+    <p>| <code>'min12int3x1'</code></p>
+    <p>| <code>'min12int3x2'</code></p>
+    <p>| <code>'min12int3x3'</code></p>
+    <p>| <code>'min12int3x4'</code></p>
+    <p>| <code>'min12int4'</code></p>
+    <p>| <code>'min12int4x1'</code></p>
+    <p>| <code>'min12int4x2'</code></p>
+    <p>| <code>'min12int4x3'</code></p>
+    <p>| <code>'min12int4x4'</code></p>
+    <p>| <code>'min16float'</code></p>
+    <p>| <code>'min16float1'</code></p>
+    <p>| <code>'min16float1x1'</code></p>
+    <p>| <code>'min16float1x2'</code></p>
+    <p>| <code>'min16float1x3'</code></p>
+    <p>| <code>'min16float1x4'</code></p>
+    <p>| <code>'min16float2'</code></p>
+    <p>| <code>'min16float2x1'</code></p>
+    <p>| <code>'min16float2x2'</code></p>
+    <p>| <code>'min16float2x3'</code></p>
+    <p>| <code>'min16float2x4'</code></p>
+    <p>| <code>'min16float3'</code></p>
+    <p>| <code>'min16float3x1'</code></p>
+    <p>| <code>'min16float3x2'</code></p>
+    <p>| <code>'min16float3x3'</code></p>
+    <p>| <code>'min16float3x4'</code></p>
+    <p>| <code>'min16float4'</code></p>
+    <p>| <code>'min16float4x1'</code></p>
+    <p>| <code>'min16float4x2'</code></p>
+    <p>| <code>'min16float4x3'</code></p>
+    <p>| <code>'min16float4x4'</code></p>
+    <p>| <code>'min16int'</code></p>
+    <p>| <code>'min16int1'</code></p>
+    <p>| <code>'min16int1x1'</code></p>
+    <p>| <code>'min16int1x2'</code></p>
+    <p>| <code>'min16int1x3'</code></p>
+    <p>| <code>'min16int1x4'</code></p>
+    <p>| <code>'min16int2'</code></p>
+    <p>| <code>'min16int2x1'</code></p>
+    <p>| <code>'min16int2x2'</code></p>
+    <p>| <code>'min16int2x3'</code></p>
+    <p>| <code>'min16int2x4'</code></p>
+    <p>| <code>'min16int3'</code></p>
+    <p>| <code>'min16int3x1'</code></p>
+    <p>| <code>'min16int3x2'</code></p>
+    <p>| <code>'min16int3x3'</code></p>
+    <p>| <code>'min16int3x4'</code></p>
+    <p>| <code>'min16int4'</code></p>
+    <p>| <code>'min16int4x1'</code></p>
+    <p>| <code>'min16int4x2'</code></p>
+    <p>| <code>'min16int4x3'</code></p>
+    <p>| <code>'min16int4x4'</code></p>
+    <p>| <code>'min16uint'</code></p>
+    <p>| <code>'min16uint1'</code></p>
+    <p>| <code>'min16uint1x1'</code></p>
+    <p>| <code>'min16uint1x2'</code></p>
+    <p>| <code>'min16uint1x3'</code></p>
+    <p>| <code>'min16uint1x4'</code></p>
+    <p>| <code>'min16uint2'</code></p>
+    <p>| <code>'min16uint2x1'</code></p>
+    <p>| <code>'min16uint2x2'</code></p>
+    <p>| <code>'min16uint2x3'</code></p>
+    <p>| <code>'min16uint2x4'</code></p>
+    <p>| <code>'min16uint3'</code></p>
+    <p>| <code>'min16uint3x1'</code></p>
+    <p>| <code>'min16uint3x2'</code></p>
+    <p>| <code>'min16uint3x3'</code></p>
+    <p>| <code>'min16uint3x4'</code></p>
+    <p>| <code>'min16uint4'</code></p>
+    <p>| <code>'min16uint4x1'</code></p>
+    <p>| <code>'min16uint4x2'</code></p>
+    <p>| <code>'min16uint4x3'</code></p>
+    <p>| <code>'min16uint4x4'</code></p>
+    <p>| <code>'mod'</code></p>
+    <p>| <code>'module'</code></p>
+    <p>| <code>'move'</code></p>
+    <p>| <code>'mut'</code></p>
+    <p>| <code>'mutable'</code></p>
+    <p>| <code>'namespace'</code></p>
+    <p>| <code>'new'</code></p>
+    <p>| <code>'nil'</code></p>
+    <p>| <code>'noexcept'</code></p>
+    <p>| <code>'noinline'</code></p>
+    <p>| <code>'nointerpolation'</code></p>
+    <p>| <code>'noperspective'</code></p>
+    <p>| <code>'null'</code></p>
+    <p>| <code>'nullptr'</code></p>
+    <p>| <code>'of'</code></p>
+    <p>| <code>'operator'</code></p>
+    <p>| <code>'out'</code></p>
+    <p>| <code>'output'</code></p>
+    <p>| <code>'package'</code></p>
+    <p>| <code>'packoffset'</code></p>
+    <p>| <code>'partition'</code></p>
+    <p>| <code>'pass'</code></p>
+    <p>| <code>'patch'</code></p>
+    <p>| <code>'pixelfragment'</code></p>
+    <p>| <code>'point'</code></p>
+    <p>| <code>'precise'</code></p>
+    <p>| <code>'precision'</code></p>
     <p>| <code>'premerge'</code></p>
+    <p>| <code>'priv'</code></p>
+    <p>| <code>'protected'</code></p>
+    <p>| <code>'pub'</code></p>
+    <p>| <code>'public'</code></p>
+    <p>| <code>'readonly'</code></p>
+    <p>| <code>'ref'</code></p>
     <p>| <code>'regardless'</code></p>
+    <p>| <code>'register'</code></p>
+    <p>| <code>'reinterpret_cast'</code></p>
+    <p>| <code>'requires'</code></p>
+    <p>| <code>'resource'</code></p>
+    <p>| <code>'restrict'</code></p>
+    <p>| <code>'row_major'</code></p>
+    <p>| <code>'samper'</code></p>
+    <p>| <code>'sample'</code></p>
+    <p>| <code>'sampler1D'</code></p>
+    <p>| <code>'sampler1DArray'</code></p>
+    <p>| <code>'sampler1DArrayShadow'</code></p>
+    <p>| <code>'sampler1DShadow'</code></p>
+    <p>| <code>'sampler2D'</code></p>
+    <p>| <code>'sampler2DArray'</code></p>
+    <p>| <code>'sampler2DArrayShadow'</code></p>
+    <p>| <code>'sampler2DMS'</code></p>
+    <p>| <code>'sampler2DMSArray'</code></p>
+    <p>| <code>'sampler2DRect'</code></p>
+    <p>| <code>'sampler2DRectShadow'</code></p>
+    <p>| <code>'sampler2DShadow'</code></p>
+    <p>| <code>'sampler3D'</code></p>
+    <p>| <code>'sampler3DRect'</code></p>
+    <p>| <code>'samplerBuffer'</code></p>
+    <p>| <code>'samplerCube'</code></p>
+    <p>| <code>'samplerCubeArray'</code></p>
+    <p>| <code>'samplerCubeArrayShadow'</code></p>
+    <p>| <code>'samplerCubeShadow'</code></p>
+    <p>| <code>'samplerShadow'</code></p>
+    <p>| <code>'self'</code></p>
+    <p>| <code>'set'</code></p>
+    <p>| <code>'shared'</code></p>
+    <p>| <code>'short'</code></p>
+    <p>| <code>'signed'</code></p>
+    <p>| <code>'sizeof'</code></p>
+    <p>| <code>'smooth'</code></p>
+    <p>| <code>'snorm'</code></p>
+    <p>| <code>'stateblock'</code></p>
+    <p>| <code>'stateblock_state'</code></p>
+    <p>| <code>'static'</code></p>
+    <p>| <code>'static_assert'</code></p>
+    <p>| <code>'static_cast'</code></p>
     <p>| <code>'std'</code></p>
+    <p>| <code>'string'</code></p>
+    <p>| <code>'subpassInput'</code></p>
+    <p>| <code>'subpassInputMS'</code></p>
+    <p>| <code>'subroutine'</code></p>
+    <p>| <code>'super'</code></p>
+    <p>| <code>'superp'</code></p>
+    <p>| <code>'target'</code></p>
+    <p>| <code>'tbuffer'</code></p>
+    <p>| <code>'technique'</code></p>
+    <p>| <code>'technique10'</code></p>
+    <p>| <code>'technique11'</code></p>
+    <p>| <code>'template'</code></p>
+    <p>| <code>'texture'</code></p>
+    <p>| <code>'texture1D'</code></p>
+    <p>| <code>'texture1DArray'</code></p>
+    <p>| <code>'texture2D'</code></p>
+    <p>| <code>'texture2DArray'</code></p>
+    <p>| <code>'texture2DMS'</code></p>
+    <p>| <code>'texture2DMSArray'</code></p>
+    <p>| <code>'texture2DRect'</code></p>
+    <p>| <code>'texture3D'</code></p>
+    <p>| <code>'textureBuffer'</code></p>
+    <p>| <code>'textureCube'</code></p>
+    <p>| <code>'textureCubeArray'</code></p>
+    <p>| <code>'this'</code></p>
+    <p>| <code>'thread_local'</code></p>
+    <p>| <code>'throw'</code></p>
+    <p>| <code>'trait'</code></p>
+    <p>| <code>'triangle'</code></p>
+    <p>| <code>'triangleadj'</code></p>
+    <p>| <code>'try'</code></p>
     <p>| <code>'typedef'</code></p>
-    <p>| <code>'u8'</code></p>
+    <p>| <code>'typeid'</code></p>
+    <p>| <code>'typename'</code></p>
+    <p>| <code>'typeof'</code></p>
     <p>| <code>'u16'</code></p>
     <p>| <code>'u64'</code></p>
+    <p>| <code>'u8'</code></p>
+    <p>| <code>'uimage1D'</code></p>
+    <p>| <code>'uimage1DArray'</code></p>
+    <p>| <code>'uimage2D'</code></p>
+    <p>| <code>'uimage2DArray'</code></p>
+    <p>| <code>'uimage2DMS'</code></p>
+    <p>| <code>'uimage2DMSArray'</code></p>
+    <p>| <code>'uimage2DRect'</code></p>
+    <p>| <code>'uimage3D'</code></p>
+    <p>| <code>'uimageBuffer'</code></p>
+    <p>| <code>'uimageCube'</code></p>
+    <p>| <code>'uimageCubeArray'</code></p>
+    <p>| <code>'uint'</code></p>
+    <p>| <code>'uint1'</code></p>
+    <p>| <code>'uint1x1'</code></p>
+    <p>| <code>'uint1x2'</code></p>
+    <p>| <code>'uint1x3'</code></p>
+    <p>| <code>'uint1x4'</code></p>
+    <p>| <code>'uint2'</code></p>
+    <p>| <code>'uint2x1'</code></p>
+    <p>| <code>'uint2x2'</code></p>
+    <p>| <code>'uint2x3'</code></p>
+    <p>| <code>'uint2x4'</code></p>
+    <p>| <code>'uint3'</code></p>
+    <p>| <code>'uint3x1'</code></p>
+    <p>| <code>'uint3x2'</code></p>
+    <p>| <code>'uint3x3'</code></p>
+    <p>| <code>'uint3x4'</code></p>
+    <p>| <code>'uint4'</code></p>
+    <p>| <code>'uint4x1'</code></p>
+    <p>| <code>'uint4x2'</code></p>
+    <p>| <code>'uint4x3'</code></p>
+    <p>| <code>'uint4x4'</code></p>
+    <p>| <code>'union'</code></p>
     <p>| <code>'unless'</code></p>
+    <p>| <code>'unorm'</code></p>
+    <p>| <code>'unsafe'</code></p>
+    <p>| <code>'unsigned'</code></p>
+    <p>| <code>'unsized'</code></p>
+    <p>| <code>'usampler1D'</code></p>
+    <p>| <code>'usampler1DArray'</code></p>
+    <p>| <code>'usampler2D'</code></p>
+    <p>| <code>'usampler2DArray'</code></p>
+    <p>| <code>'usampler2DMS'</code></p>
+    <p>| <code>'usampler2DMSArray'</code></p>
+    <p>| <code>'usampler2DRect'</code></p>
+    <p>| <code>'usampler3D'</code></p>
+    <p>| <code>'usamplerBuffer'</code></p>
+    <p>| <code>'usamplerCube'</code></p>
+    <p>| <code>'usamplerCubeArray'</code></p>
+    <p>| <code>'use'</code></p>
     <p>| <code>'using'</code></p>
+    <p>| <code>'usubpassInput'</code></p>
+    <p>| <code>'usubpassInputMS'</code></p>
+    <p>| <code>'utexture1D'</code></p>
+    <p>| <code>'utexture1DArray'</code></p>
+    <p>| <code>'utexture2D'</code></p>
+    <p>| <code>'utexture2DArray'</code></p>
+    <p>| <code>'utexture2DMS'</code></p>
+    <p>| <code>'utexture2DMSArray'</code></p>
+    <p>| <code>'utexture2DRect'</code></p>
+    <p>| <code>'utexture3D'</code></p>
+    <p>| <code>'utextureBuffer'</code></p>
+    <p>| <code>'utextureCube'</code></p>
+    <p>| <code>'utextureCubeArray'</code></p>
+    <p>| <code>'uvec2'</code></p>
+    <p>| <code>'uvec3'</code></p>
+    <p>| <code>'uvec4'</code></p>
+    <p>| <code>'varying'</code></p>
     <p>| <code>'vec'</code></p>
+    <p>| <code>'vector'</code></p>
+    <p>| <code>'vertexfragment'</code></p>
+    <p>| <code>'virtual'</code></p>
     <p>| <code>'void'</code></p>
+    <p>| <code>'volatile'</code></p>
+    <p>| <code>'wchar_t'</code></p>
     <p>| <code>'wgsl'</code></p>
+    <p>| <code>'where'</code></p>
+    <p>| <code>'with'</code></p>
+    <p>| <code>'writeonly'</code></p>
+    <p>| <code>'yield'</code></p>
    </div>
    <h3 class="heading settled" data-level="14.3" id="syntactic-tokens"><span class="secno">14.3. </span><span class="content">Syntactic Tokens</span><a class="self-link" href="#syntactic-tokens"></a></h3>
    <p>A <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="syntactic-token">syntactic token</dfn> is a sequence of special characters, used:</p>
@@ -9364,8 +9928,7 @@ Each of these distinct function variations is an <a data-link-type="dfn" href="#
      <p>The behaviour of this overload of the function.</p>
    </ul>
    <p>Since a built-in function is always in scope, it is an error to attempt to redefine
-one or to use the name of a built-in function as an <a data-link-type="dfn" href="#identifier" id="ref-for-identifier①⑨">identifier</a> for any other
-kind of declaration.</p>
+one or to use the name of a built-in function as an <a data-link-type="dfn" href="#identifier" id="ref-for-identifier①⑨">identifier</a> for any other <a data-link-type="dfn" href="#module-scope" id="ref-for-module-scope②②">module-scope</a> declaration.</p>
    <p>When calling a built-in function, all arguments to the function are evaluated
 before function evaluation begins.
 See <a href="#function-calls">§ 8.2 Function Calls</a>.</p>
@@ -9432,34 +9995,52 @@ See <a href="#function-calls">§ 8.2 Function Calls</a>.</p>
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>acos(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
       <td>Returns the arc cosine of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑤⑧">Component-wise</a> when <var>T</var> is a vector. 
+     <tr class="algorithm" data-algorithm="acosh">
+      <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
+      <td class="nowrap"><code>acosh(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
+      <td>
+       Returns the hyperbolic arc cosine of <var>e</var>.
+    The result is 0 when <var>e</var> &lt; 1.<br> Computes the non-negative functional inverse of <code>cosh</code>.<br> <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑤⑨">Component-wise</a> when <var>T</var> is a vector. 
+       <p class="note" role="note"><span>Note:</span> The result is not mathematically meaningful when <var>e</var> &lt; 1.</p>
      <tr class="algorithm" data-algorithm="asin">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>asin(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Returns the arc sine of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑤⑨">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns the arc sine of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑥⓪">Component-wise</a> when <var>T</var> is a vector. 
+     <tr class="algorithm" data-algorithm="asinh">
+      <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
+      <td class="nowrap"><code>asinh(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
+      <td>Returns the hyperbolic arc sine of <var>e</var>.<br> Computes the functional inverse of <code>sinh</code>.<br> <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑥①">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="atan">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>atan(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Returns the arc tangent of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑥⓪">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns the arc tangent of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑥②">Component-wise</a> when <var>T</var> is a vector. 
+     <tr class="algorithm" data-algorithm="atanh">
+      <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
+      <td class="nowrap"><code>atanh(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
+      <td>
+       Returns the hyperbolic arc tangent of <var>e</var>.
+    The result is 0 when <code>abs</code>(<var>e</var>) ≥ 1.<br> Computes the functional inverse of <code>tanh</code>.<br> <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑥③">Component-wise</a> when <var>T</var> is a vector. 
+       <p class="note" role="note"><span>Note:</span> The result is not mathematically meaningful when <code>abs</code>(<var>e</var>) ≥ 1.<br></p>
      <tr class="algorithm" data-algorithm="atan2">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>atan2(</code><var>e1</var><code>:</code> <var>T</var> <code>,</code><var>e2</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Returns the arc tangent of <var>e1</var> over <var>e2</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑥①">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns the arc tangent of <var>e1</var> over <var>e2</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑥④">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="ceil">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>ceil(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Returns the <a data-link-type="dfn" href="#ceiling-expression" id="ref-for-ceiling-expression">ceiling</a> of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑥②">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns the <a data-link-type="dfn" href="#ceiling-expression" id="ref-for-ceiling-expression">ceiling</a> of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑥⑤">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="clamp">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>clamp(</code><var>e</var><code>:</code> <var>T</var> <code>,</code> <var>low</var><code>:</code> <var>T</var> <code>,</code> <var>high</var><code>:</code> <var>T</var><code>) -></code> <var>T</var> 
-      <td>Returns <code>min(max(</code><var>e</var><code>,</code><var>low</var><code>),</code><var>high</var><code>)</code>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑥③">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns <code>min(max(</code><var>e</var><code>,</code><var>low</var><code>),</code><var>high</var><code>)</code>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑥⑥">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="cos">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>cos(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Returns the cosine of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑥④">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns the cosine of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑥⑦">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="cosh">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>cosh(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Returns the hyperbolic cosine of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑥⑤">Component-wise</a> when <var>T</var> is a vector 
+      <td>Returns the hyperbolic cosine of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑥⑧">Component-wise</a> when <var>T</var> is a vector 
      <tr class="algorithm" data-algorithm="vector case, cross">
       <td><var>T</var> is f32 
       <td class="nowrap"><code>cross(</code><var>e1</var><code>:</code> vec3&lt;<var>T</var>> <code>,</code><var>e2</var><code>:</code> vec3&lt;<var>T</var>><code>) -></code> vec3&lt;<var>T</var>> 
@@ -9467,7 +10048,7 @@ See <a href="#function-calls">§ 8.2 Function Calls</a>.</p>
      <tr class="algorithm" data-algorithm="degrees">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>degrees(</code><var>e1</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Converts radians to degrees, approximating <var>e1</var> × 180 ÷ π. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑥⑥">Component-wise</a> when <var>T</var> is a vector<br> 
+      <td>Converts radians to degrees, approximating <var>e1</var> × 180 ÷ π. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑥⑨">Component-wise</a> when <var>T</var> is a vector<br> 
      <tr class="algorithm" data-algorithm="distance">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>distance(</code><var>e1</var><code>:</code> <var>T</var> <code>,</code><var>e2</var><code>:</code> <var>T</var> <code>) -></code> f32 
@@ -9475,11 +10056,11 @@ See <a href="#function-calls">§ 8.2 Function Calls</a>.</p>
      <tr class="algorithm" data-algorithm="exp">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>exp(</code><var>e1</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Returns the natural exponentiation of <var>e1</var> (e.g. <code>e</code><sup><var>e1</var></sup>). <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑥⑦">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns the natural exponentiation of <var>e1</var> (e.g. <code>e</code><sup><var>e1</var></sup>). <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑦⓪">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="exp2">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>exp2(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Returns 2 raised to the power <var>e</var> (e.g. <code>2</code><sup><var>e</var></sup>). <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑥⑧">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns 2 raised to the power <var>e</var> (e.g. <code>2</code><sup><var>e</var></sup>). <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑦①">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="faceForward">
       <td><var>T</var> is vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>faceForward(</code><var>e1</var><code>:</code> <var>T</var> <code>,</code><var>e2</var><code>:</code> <var>T</var> <code>,</code><var>e3</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
@@ -9487,15 +10068,15 @@ See <a href="#function-calls">§ 8.2 Function Calls</a>.</p>
      <tr class="algorithm" data-algorithm="floor">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>floor(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Returns the <a data-link-type="dfn" href="#floor-expression" id="ref-for-floor-expression">floor</a> of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑥⑨">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns the <a data-link-type="dfn" href="#floor-expression" id="ref-for-floor-expression">floor</a> of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑦②">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="fma">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>fma(</code><var>e1</var><code>:</code> <var>T</var> <code>,</code><var>e2</var><code>:</code> <var>T</var> <code>,</code><var>e3</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Returns <var>e1</var> <code>*</code> <var>e2</var> <code>+</code> <var>e3</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑦⓪">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns <var>e1</var> <code>*</code> <var>e2</var> <code>+</code> <var>e3</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑦③">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="fract">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>fract(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Returns the fractional part of <var>e</var>, computed as <var>e</var> <code>- floor(</code><var>e</var><code>)</code>.<br> <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑦①">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns the fractional part of <var>e</var>, computed as <var>e</var> <code>- floor(</code><var>e</var><code>)</code>.<br> <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑦④">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="scalar case, frexp">
       <td><var>T</var> is f32 
       <td class="nowrap"><code>frexp(</code><var>e</var><code>:</code><var>T</var><code>) -> __frexp_result</code><br> 
@@ -9534,11 +10115,11 @@ let fraction_direct = frexp(1.5).sig;
      <tr class="algorithm" data-algorithm="inverseSqrt">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>inverseSqrt(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Returns the reciprocal of <code>sqrt(</code><var>e</var><code>)</code>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑦②">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns the reciprocal of <code>sqrt(</code><var>e</var><code>)</code>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑦⑤">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="ldexp">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32><br> <var>I</var> is i32 or vec<var>N</var>&lt;i32>, where<br> <var>I</var> is a scalar if <var>T</var> is a scalar, or<br> a vector when <var>T</var> is a vector 
       <td class="nowrap"><code>ldexp(</code><var>e1</var><code>:</code> <var>T</var> <code>,</code><var>e2</var><code>:</code> <var>I</var> <code>) -></code> <var>T</var> 
-      <td>Returns <var>e1</var> <code>* 2</code><sup><var>e2</var></sup>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑦③">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns <var>e1</var> <code>* 2</code><sup><var>e2</var></sup>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑦⑥">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="length">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>length(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> f32 
@@ -9546,27 +10127,27 @@ let fraction_direct = frexp(1.5).sig;
      <tr class="algorithm" data-algorithm="log">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>log(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Returns the natural logarithm of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑦④">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns the natural logarithm of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑦⑦">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="log2">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>log2(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Returns the base-2 logarithm of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑦⑤">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns the base-2 logarithm of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑦⑧">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="max">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>max(</code><var>e1</var><code>:</code> <var>T</var> <code>,</code><var>e2</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
       <td>Returns <var>e2</var> if <var>e1</var> is less than <var>e2</var>, and <var>e1</var> otherwise.
     If one operand is a NaN, the other is returned.
-    If both operands are NaNs, a NaN is returned. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑦⑥">Component-wise</a> when <var>T</var> is a vector. 
+    If both operands are NaNs, a NaN is returned. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑦⑨">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="min">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>min(</code><var>e1</var><code>:</code> <var>T</var> <code>,</code><var>e2</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
       <td>Returns <var>e2</var> if <var>e2</var> is less than <var>e1</var>, and <var>e1</var> otherwise.
     If one operand is a NaN, the other is returned.
-    If both operands are NaNs, a NaN is returned. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑦⑦">Component-wise</a> when <var>T</var> is a vector. 
+    If both operands are NaNs, a NaN is returned. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑧⓪">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="mix all same type operands">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>mix(</code><var>e1</var><code>:</code> <var>T</var> <code>,</code><var>e2</var><code>:</code> <var>T</var> <code>,</code><var>e3</var><code>:</code> <var>T</var><code>) -></code> <var>T</var> 
-      <td>Returns the linear blend of <var>e1</var> and <var>e2</var> (e.g. <var>e1</var><code>*(1-</code><var>e3</var><code>)+</code><var>e2</var><code>*</code><var>e3</var>). <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑦⑧">Component-wise</a> when <var>T</var> is a vector. <br> 
+      <td>Returns the linear blend of <var>e1</var> and <var>e2</var> (e.g. <var>e1</var><code>*(1-</code><var>e3</var><code>)+</code><var>e2</var><code>*</code><var>e3</var>). <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑧①">Component-wise</a> when <var>T</var> is a vector. <br> 
      <tr class="algorithm" data-algorithm="vector mix with scalar blending factor">
       <td><var>T</var> is vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>mix(</code><var>e1</var><code>:</code> <var>T</var> <code>,</code><var>e2</var><code>:</code> <var>T</var> <code>,</code><var>e3</var><code>:</code> f32 <code>) -></code> <var>T</var> 
@@ -9612,18 +10193,18 @@ let fract_direct = modf(1.5).fract;
      <tr class="algorithm" data-algorithm="pow">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>pow(</code><var>e1</var><code>:</code> <var>T</var> <code>,</code><var>e2</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Returns <var>e1</var> raised to the power <var>e2</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑦⑨">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns <var>e1</var> raised to the power <var>e2</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑧②">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="quantize to f16">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>quantizeToF16(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
       <td>
        Quantizes a 32-bit floating point value <var>e</var> as if <var>e</var> were converted to a <a data-link-type="biblio" href="#biblio-ieee-754">IEEE 754</a> binary16 value,
-        and then converted back to a IEEE 754 binary32 value.<br> See <a href="#floating-point-conversion">§ 12.5.2 Floating Point Conversion</a>.<br> <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑧⓪">Component-wise</a> when <var>T</var> is a vector.<br> 
+        and then converted back to a IEEE 754 binary32 value.<br> See <a href="#floating-point-conversion">§ 12.5.2 Floating Point Conversion</a>.<br> <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑧③">Component-wise</a> when <var>T</var> is a vector.<br> 
        <p class="note" role="note"><span>Note:</span> The vec2&lt;f32> case is the same as <code>unpack2x16float(pack2x16float(</code><var>e</var><code>))</code>.</p>
      <tr class="algorithm" data-algorithm="radians">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>radians(</code><var>e1</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Converts degrees to radians, approximating <var>e1</var> × π ÷ 180. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑧①">Component-wise</a> when <var>T</var> is a vector<br> 
+      <td>Converts degrees to radians, approximating <var>e1</var> × π ÷ 180. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑧④">Component-wise</a> when <var>T</var> is a vector<br> 
      <tr class="algorithm" data-algorithm="reflect">
       <td><var>T</var> is vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>reflect(</code><var>e1</var><code>:</code> <var>T</var> <code>,</code><var>e2</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
@@ -9638,46 +10219,46 @@ let fract_direct = modf(1.5).fract;
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>round(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
       <td>Result is the integer <var>k</var> nearest to <var>e</var>, as a floating point value.<br> When <var>e</var> lies halfway between integers <var>k</var> and <var>k</var>+1,
-        the result is <var>k</var> when <var>k</var> is even, and <var>k</var>+1 when <var>k</var> is odd.<br> <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑧②">Component-wise</a> when <var>T</var> is a vector. 
+        the result is <var>k</var> when <var>k</var> is even, and <var>k</var>+1 when <var>k</var> is odd.<br> <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑧⑤">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="float sign">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>sign(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Returns the sign of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑧③">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns the sign of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑧⑥">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="sin">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>sin(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Returns the sine of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑧④">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns the sine of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑧⑦">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="sinh">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>sinh(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Returns the hyperbolic sine of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑧⑤">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns the hyperbolic sine of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑧⑧">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="smoothStep">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>smoothStep(</code><var>low</var><code>:</code> <var>T</var> <code>,</code> <var>high</var><code>:</code> <var>T</var> <code>,</code> <var>x</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
       <td>
-       Returns the smooth Hermite interpolation between 0 and 1. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑧⑥">Component-wise</a> when <var>T</var> is a vector. 
+       Returns the smooth Hermite interpolation between 0 and 1. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑧⑨">Component-wise</a> when <var>T</var> is a vector. 
        <p>For scalar <var>T</var>, the result is <var>t</var> * <var>t</var> * (3.0 - 2.0 * <var>t</var>),
     where <var>t</var> = clamp((<var>x</var> - <var>low</var>) / (<var>high</var> - <var>low</var>), 0.0, 1.0).</p>
      <tr class="algorithm" data-algorithm="sqrt">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>sqrt(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Returns the square root of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑧⑦">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns the square root of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑨⓪">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="step">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>step(</code><var>edge</var><code>:</code> <var>T</var> <code>,</code><var>x</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Returns 1.0 if <var>edge</var> ≤ <var>x</var>, and 0.0 otherwise. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑧⑧">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns 1.0 if <var>edge</var> ≤ <var>x</var>, and 0.0 otherwise. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑨①">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="tan">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>tan(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Returns the tangent of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑧⑨">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns the tangent of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑨②">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="tanh">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>tanh(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Returns the hyperbolic tangent of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑨⓪">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns the hyperbolic tangent of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑨③">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="trunc">
       <td><var>T</var> is f32 or vec<var>N</var>&lt;f32> 
       <td class="nowrap"><code>trunc(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>Returns the nearest whole number whose absolute value is less than or equal to <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑨①">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns the nearest whole number whose absolute value is less than or equal to <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑨④">Component-wise</a> when <var>T</var> is a vector. 
    </table>
    <h3 class="heading settled" data-level="16.4" id="integer-builtin-functions"><span class="secno">16.4. </span><span class="content">Integer Built-in Functions</span><a class="self-link" href="#integer-builtin-functions"></a></h3>
    <table class="data">
@@ -9690,34 +10271,34 @@ let fract_direct = modf(1.5).fract;
      <tr class="algorithm" data-algorithm="signed abs">
       <td><var>T</var> is i32 or vec<var>N</var>&lt;i32> 
       <td class="nowrap"><code>abs</code>(<var>e</var>: <var>T</var> ) -> <var>T</var> 
-      <td>The absolute value of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑨②">Component-wise</a> when <var>T</var> is a vector.
+      <td>The absolute value of <var>e</var>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑨⑤">Component-wise</a> when <var>T</var> is a vector.
         If <var>e</var> evaluates to the largest negative value, then the result is <var>e</var>. 
      <tr class="algorithm" data-algorithm="scalar case, unsigned abs">
       <td><var>T</var> is u32 or vec<var>N</var>&lt;u32> 
       <td class="nowrap"><code>abs</code>(<var>e</var>: <var>T</var> ) -> <var>T</var> 
-      <td>Result is <var>e</var>.  This is provided for symmetry with <code>abs</code> for signed integers. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑨③">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Result is <var>e</var>.  This is provided for symmetry with <code>abs</code> for signed integers. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑨⑥">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="unsigned clamp">
       <td><var>T</var> is u32 or vec<var>N</var>&lt;u32> 
       <td class="nowrap"><code>clamp(</code><var>e</var><code>:</code> <var>T</var> <code>,</code> <var>low</var><code>:</code> <var>T</var><code>,</code> <var>high</var><code>:</code> <var>T</var><code>) -></code> <var>T</var> 
-      <td>Returns <code>min(max(</code><var>e</var><code>,</code><var>low</var><code>),</code><var>high</var><code>)</code>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑨④">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns <code>min(max(</code><var>e</var><code>,</code><var>low</var><code>),</code><var>high</var><code>)</code>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑨⑦">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="signed clamp">
       <td><var>T</var> is i32 or vec<var>N</var>&lt;i32> 
       <td class="nowrap"><code>clamp(</code><var>e</var><code>:</code> <var>T</var> <code>,</code> <var>low</var><code>:</code> <var>T</var><code>,</code> <var>high</var><code>:</code> <var>T</var><code>) -></code> <var>T</var> 
-      <td>Returns <code>min(max(</code><var>e</var><code>,</code><var>low</var><code>),</code><var>high</var><code>)</code>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑨⑤">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns <code>min(max(</code><var>e</var><code>,</code><var>low</var><code>),</code><var>high</var><code>)</code>. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑨⑧">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="count leading zeroes">
       <td><var>T</var> is i32, u32, vec<var>N</var>&lt;i32>, or vec<var>N</var>&lt;u32> 
       <td class="nowrap"><code>countLeadingZeros(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
       <td>The number of consecutive 0 bits starting from the most significant bit
-        of <var>e</var>, when <var>T</var> is a scalar type.<br> <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑨⑥">Component-wise</a> when <var>T</var> is a vector.<br> Also known as "clz" in some languages.<br> 
+        of <var>e</var>, when <var>T</var> is a scalar type.<br> <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑨⑨">Component-wise</a> when <var>T</var> is a vector.<br> Also known as "clz" in some languages.<br> 
      <tr class="algorithm" data-algorithm="count 1 bits">
       <td><var>T</var> is i32, u32, vec<var>N</var>&lt;i32>, or vec<var>N</var>&lt;u32> 
       <td class="nowrap"><code>countOneBits(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
-      <td>The number of 1 bits in the representation of <var>e</var>.<br> Also known as "population count".<br> <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑨⑦">Component-wise</a> when <var>T</var> is a vector. 
+      <td>The number of 1 bits in the representation of <var>e</var>.<br> Also known as "population count".<br> <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise①⓪⓪">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="count trailing zeroes">
       <td><var>T</var> is i32, u32, vec<var>N</var>&lt;i32>, or vec<var>N</var>&lt;u32> 
       <td class="nowrap"><code>countTrailingZeros(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
       <td>The number of consecutive 0 bits starting from the least significant bit
-        of <var>e</var>, when <var>T</var> is a scalar type.<br> <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑨⑧">Component-wise</a> when <var>T</var> is a vector.<br> Also known as "ctz" in some languages.<br> 
+        of <var>e</var>, when <var>T</var> is a scalar type.<br> <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise①⓪①">Component-wise</a> when <var>T</var> is a vector.<br> Also known as "ctz" in some languages.<br> 
      <tr class="algorithm" data-algorithm="signed find most significant one bit">
       <td><var>T</var> is i32 or vec<var>N</var>&lt;i32> 
       <td class="nowrap"><code>firstLeadingBit(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
@@ -9729,7 +10310,7 @@ let fract_direct = modf(1.5).fract;
        </ul>
        <p class="note" role="note"><span>Note:</span> Since signed integers use twos-complement representation,
         the sign bit appears in the most significant bit position.</p>
-       <p><a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise⑨⑨">Component-wise</a> when <var>T</var> is a vector.<br></p>
+       <p><a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise①⓪②">Component-wise</a> when <var>T</var> is a vector.<br></p>
      <tr class="algorithm" data-algorithm="unsigned find most significant one bit">
       <td><var>T</var> is u32 or vec<var>N</var>&lt;u32> 
       <td class="nowrap"><code>firstLeadingBit(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
@@ -9740,7 +10321,7 @@ let fract_direct = modf(1.5).fract;
         <li>Otherwise the position of the most significant 1
             bit in <var>e</var>. 
        </ul>
-        <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise①⓪⓪">Component-wise</a> when <var>T</var> is a vector.<br> 
+        <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise①⓪③">Component-wise</a> when <var>T</var> is a vector.<br> 
      <tr class="algorithm" data-algorithm="find least significant one bit">
       <td><var>T</var> is i32, u32, vec<var>N</var>&lt;i32>, or vec<var>N</var>&lt;u32> 
       <td class="nowrap"><code>firstTrailingBit(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
@@ -9751,7 +10332,7 @@ let fract_direct = modf(1.5).fract;
         <li>Otherwise the position of the least significant 1
             bit in <var>e</var>. 
        </ul>
-        <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise①⓪①">Component-wise</a> when <var>T</var> is a vector. 
+        <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise①⓪④">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="signed extract bits">
       <td><var>T</var> is i32 or vec<var>N</var>&lt;i32> 
       <td class="nowrap"><code>extractBits(</code><br> <var>e</var><code>:</code> <var>T</var><code>,</code><br> <var>offset</var><code>: u32,</code><br> <var>count</var><code>: u32) -></code> <var>T</var> 
@@ -9766,7 +10347,7 @@ let fract_direct = modf(1.5).fract;
         <li>Otherwise, bits 0..<var>c</var>-1 of the result are copied from bits <var>o</var>..<var>o</var>+<var>c</var>-1 of <var>e</var>.
        Other bits of the result are the same as bit <var>c</var>-1 of the result. 
        </ul>
-        <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise①⓪②">Component-wise</a> when <var>T</var> is a vector. 
+        <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise①⓪⑤">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="unsigned extract bits">
       <td><var>T</var> is u32 or vec<var>N</var>&lt;u32> 
       <td class="nowrap"><code>extractBits(</code><br> <var>e</var><code>:</code> <var>T</var><code>,</code><br> <var>offset</var><code>: u32,</code><br> <var>count</var><code>: u32) -></code> <var>T</var> 
@@ -9781,7 +10362,7 @@ let fract_direct = modf(1.5).fract;
         <li>Otherwise, bits 0..<var>c</var>-1 of the result are copied from bits <var>o</var>..<var>o</var>+<var>c</var>-1 of <var>e</var>.
        Other bits of the result are 0. 
        </ul>
-        <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise①⓪③">Component-wise</a> when <var>T</var> is a vector. 
+        <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise①⓪⑥">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="insert bits">
       <td><var>T</var> is i32, u32, vec<var>N</var>&lt;i32>, or vec<var>N</var>&lt;u32> 
       <td class="nowrap"><code>insertBits(</code><br> <var>e</var><code>:</code> <var>T</var><code>,</code><br> <var>newbits</var><code>:</code><var>T</var><code>,</code><br> <var>offset</var><code>: u32,</code><br> <var>count</var><code>: u32) -></code> <var>T</var> 
@@ -9797,28 +10378,28 @@ let fract_direct = modf(1.5).fract;
        bits <var>o</var>..<var>o</var>+<var>c</var>-1 of the result are copied from bits 0..<var>c</var>-1 of <var>newbits</var>.
        Other bits of the result are copied from <var>e</var>. 
        </ul>
-        <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise①⓪④">Component-wise</a> when <var>T</var> is a vector. 
+        <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise①⓪⑦">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="unsigned max">
       <td><var>T</var> is u32 or vec<var>N</var>&lt;u32> 
       <td class="nowrap"><code>max(</code><var>e1</var><code>:</code> <var>T</var> <code>,</code><var>e2</var><code>:</code> <var>T</var><code>) -></code> <var>T</var> 
-      <td>Returns <var>e2</var> if <var>e1</var> is less than <var>e2</var>, and <var>e1</var> otherwise. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise①⓪⑤">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns <var>e2</var> if <var>e1</var> is less than <var>e2</var>, and <var>e1</var> otherwise. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise①⓪⑧">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="signed max">
       <td><var>T</var> is i32 or vec<var>N</var>&lt;i32> 
       <td class="nowrap"><code>max(</code><var>e1</var><code>:</code> <var>T</var> <code>,</code><var>e2</var><code>:</code> <var>T</var><code>) -></code> <var>T</var> 
-      <td>Returns <var>e2</var> if <var>e1</var> is less than <var>e2</var>, and <var>e1</var> otherwise. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise①⓪⑥">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns <var>e2</var> if <var>e1</var> is less than <var>e2</var>, and <var>e1</var> otherwise. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise①⓪⑨">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="unsigned min">
       <td><var>T</var> is u32 or vec<var>N</var>&lt;u32> 
       <td class="nowrap"><code>min(</code><var>e1</var><code>:</code> <var>T</var> <code>,</code><var>e2</var><code>:</code> <var>T</var><code>) -></code> <var>T</var> 
-      <td>Returns <var>e1</var> if <var>e1</var> is less than <var>e2</var>, and <var>e2</var> otherwise. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise①⓪⑦">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns <var>e1</var> if <var>e1</var> is less than <var>e2</var>, and <var>e2</var> otherwise. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise①①⓪">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="signed min">
       <td><var>T</var> is i32 or vec<var>N</var>&lt;i32> 
       <td class="nowrap"><code>min(</code><var>e1</var><code>:</code> <var>T</var> <code>,</code><var>e2</var><code>:</code> <var>T</var><code>) -></code> <var>T</var> 
-      <td>Returns <var>e1</var> if <var>e1</var> is less than <var>e2</var>, and <var>e2</var> otherwise. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise①⓪⑧">Component-wise</a> when <var>T</var> is a vector. 
+      <td>Returns <var>e1</var> if <var>e1</var> is less than <var>e2</var>, and <var>e2</var> otherwise. <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise①①①">Component-wise</a> when <var>T</var> is a vector. 
      <tr class="algorithm" data-algorithm="bit reversal">
       <td><var>T</var> is i32, u32, vec<var>N</var>&lt;i32>, or vec<var>N</var>&lt;u32> 
       <td class="nowrap"><code>reverseBits(</code><var>e</var><code>:</code> <var>T</var> <code>) -></code> <var>T</var> 
       <td>Reverses the bits in <var>e</var>:  The bit at position <var>k</var> of the result equals the
-        bit at position 31-<var>k</var> of <var>e</var>.<br> <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise①⓪⑨">Component-wise</a> when <var>T</var> is a vector. 
+        bit at position 31-<var>k</var> of <var>e</var>.<br> <a data-link-type="dfn" href="#component-wise" id="ref-for-component-wise①①②">Component-wise</a> when <var>T</var> is a vector. 
    </table>
    <h3 class="heading settled" data-level="16.5" id="matrix-builtin-functions"><span class="secno">16.5. </span><span class="content">Matrix Built-in Functions</span><a class="self-link" href="#matrix-builtin-functions"></a></h3>
    <table class="data">
@@ -10056,7 +10637,7 @@ https://github.com/gpuweb/gpuweb/issues/2343</p>
         <li data-md>
          <p>a <code>const_expression</code> expression (e.g. <code>1</code>).<br></p>
         <li data-md>
-         <p>a name of a <a data-link-type="dfn" href="#module-scope" id="ref-for-module-scope②②">module-scope</a> <a data-link-type="dfn" href="#let-declaration" id="ref-for-let-declaration⑤">let declaration</a></p>
+         <p>a name of a <a data-link-type="dfn" href="#module-scope" id="ref-for-module-scope②③">module-scope</a> <a data-link-type="dfn" href="#let-declaration" id="ref-for-let-declaration⑤">let declaration</a></p>
        </ul>
         Its value must be at least 0 and at most 3.
   Values outside of this range will result in a <a data-link-type="dfn" href="#shader-creation-error" id="ref-for-shader-creation-error⑥">shader-creation error</a>. 
@@ -10082,7 +10663,7 @@ https://github.com/gpuweb/gpuweb/issues/2343</p>
         <li data-md>
          <p>a <code>const_expression</code> expression (e.g. <code>vec2&lt;i32>(1, 2)</code>).<br></p>
         <li data-md>
-         <p>a name of a <a data-link-type="dfn" href="#module-scope" id="ref-for-module-scope②③">module-scope</a> <a data-link-type="dfn" href="#let-declaration" id="ref-for-let-declaration⑥">let declaration</a></p>
+         <p>a name of a <a data-link-type="dfn" href="#module-scope" id="ref-for-module-scope②④">module-scope</a> <a data-link-type="dfn" href="#let-declaration" id="ref-for-let-declaration⑥">let declaration</a></p>
        </ul>
         Each <code>offset</code> component must be at least <code>-8</code> and at most <code>7</code>. Values outside
   of this range will result in a <a data-link-type="dfn" href="#shader-creation-error" id="ref-for-shader-creation-error⑦">shader-creation error</a>. 
@@ -10190,7 +10771,7 @@ yielding a 0.0 or 1.0 value, as controlled by the comparison sampler parameters.
         <li data-md>
          <p>a <code>const_expression</code> expression (e.g. <code>vec2&lt;i32>(1, 2)</code>).<br></p>
         <li data-md>
-         <p>a name of a <a data-link-type="dfn" href="#module-scope" id="ref-for-module-scope②④">module-scope</a> <a data-link-type="dfn" href="#let-declaration" id="ref-for-let-declaration⑦">let declaration</a></p>
+         <p>a name of a <a data-link-type="dfn" href="#module-scope" id="ref-for-module-scope②⑤">module-scope</a> <a data-link-type="dfn" href="#let-declaration" id="ref-for-let-declaration⑦">let declaration</a></p>
        </ul>
         Each <code>offset</code> component must be at least <code>-8</code> and at most <code>7</code>. Values outside
   of this range will result in a <a data-link-type="dfn" href="#shader-creation-error" id="ref-for-shader-creation-error⑧">shader-creation error</a>. 
@@ -10359,7 +10940,7 @@ Must only be invoked in uniform control flow.</p>
         <li data-md>
          <p>a <code>const_expression</code> expression (e.g. <code>vec2&lt;i32>(1, 2)</code>).<br></p>
         <li data-md>
-         <p>a name of a <a data-link-type="dfn" href="#module-scope" id="ref-for-module-scope②⑤">module-scope</a> <a data-link-type="dfn" href="#let-declaration" id="ref-for-let-declaration⑧">let declaration</a></p>
+         <p>a name of a <a data-link-type="dfn" href="#module-scope" id="ref-for-module-scope②⑥">module-scope</a> <a data-link-type="dfn" href="#let-declaration" id="ref-for-let-declaration⑧">let declaration</a></p>
        </ul>
         Each <code>offset</code> component must be at least <code>-8</code> and at most <code>7</code>. Values outside
   of this range will result in a <a data-link-type="dfn" href="#shader-creation-error" id="ref-for-shader-creation-error⑨">shader-creation error</a>. 
@@ -10407,7 +10988,7 @@ Must only be invoked in uniform control flow.</p>
         <li data-md>
          <p>a <code>const_expression</code> expression (e.g. <code>vec2&lt;i32>(1, 2)</code>).<br></p>
         <li data-md>
-         <p>a name of a <a data-link-type="dfn" href="#module-scope" id="ref-for-module-scope②⑥">module-scope</a> <a data-link-type="dfn" href="#let-declaration" id="ref-for-let-declaration⑨">let declaration</a></p>
+         <p>a name of a <a data-link-type="dfn" href="#module-scope" id="ref-for-module-scope②⑦">module-scope</a> <a data-link-type="dfn" href="#let-declaration" id="ref-for-let-declaration⑨">let declaration</a></p>
        </ul>
         Each <code>offset</code> component must be at least <code>-8</code> and at most <code>7</code>. Values outside
   of this range will result in a <a data-link-type="dfn" href="#shader-creation-error" id="ref-for-shader-creation-error①⓪">shader-creation error</a>. 
@@ -10453,7 +11034,7 @@ Must only be invoked in uniform control flow.</p>
         <li data-md>
          <p>a <code>const_expression</code> expression (e.g. <code>vec2&lt;i32>(1, 2)</code>).<br></p>
         <li data-md>
-         <p>a name of a <a data-link-type="dfn" href="#module-scope" id="ref-for-module-scope②⑦">module-scope</a> <a data-link-type="dfn" href="#let-declaration" id="ref-for-let-declaration①⓪">let declaration</a></p>
+         <p>a name of a <a data-link-type="dfn" href="#module-scope" id="ref-for-module-scope②⑧">module-scope</a> <a data-link-type="dfn" href="#let-declaration" id="ref-for-let-declaration①⓪">let declaration</a></p>
        </ul>
         Each <code>offset</code> component must be at least <code>-8</code> and at most <code>7</code>. Values outside
   of this range will result in a <a data-link-type="dfn" href="#shader-creation-error" id="ref-for-shader-creation-error①①">shader-creation error</a>. 
@@ -10529,7 +11110,7 @@ single texel is returned.</p>
         <li data-md>
          <p>a <code>const_expression</code> expression (e.g. <code>vec2&lt;i32>(1, 2)</code>).<br></p>
         <li data-md>
-         <p>a name of a <a data-link-type="dfn" href="#module-scope" id="ref-for-module-scope②⑧">module-scope</a> <a data-link-type="dfn" href="#let-declaration" id="ref-for-let-declaration①①">let declaration</a></p>
+         <p>a name of a <a data-link-type="dfn" href="#module-scope" id="ref-for-module-scope②⑨">module-scope</a> <a data-link-type="dfn" href="#let-declaration" id="ref-for-let-declaration①①">let declaration</a></p>
        </ul>
         Each <code>offset</code> component must be at least <code>-8</code> and at most <code>7</code>. Values outside
   of this range will result in a <a data-link-type="dfn" href="#shader-creation-error" id="ref-for-shader-creation-error①②">shader-creation error</a>. 
@@ -10585,7 +11166,7 @@ single texel is returned.</p>
         <li data-md>
          <p>a <code>const_expression</code> expression (e.g. <code>vec2&lt;i32>(1, 2)</code>).<br></p>
         <li data-md>
-         <p>a name of a <a data-link-type="dfn" href="#module-scope" id="ref-for-module-scope②⑨">module-scope</a> <a data-link-type="dfn" href="#let-declaration" id="ref-for-let-declaration①②">let declaration</a></p>
+         <p>a name of a <a data-link-type="dfn" href="#module-scope" id="ref-for-module-scope③⓪">module-scope</a> <a data-link-type="dfn" href="#let-declaration" id="ref-for-let-declaration①②">let declaration</a></p>
        </ul>
         Each <code>offset</code> component must be at least <code>-8</code> and at most <code>7</code>. Values outside
   of this range will result in a <a data-link-type="dfn" href="#shader-creation-error" id="ref-for-shader-creation-error①③">shader-creation error</a>. 
@@ -10916,6 +11497,8 @@ stage.</p>
      <li><a href="#statement-break">dfn for statement</a><span>, in § 7.4.6</span>
      <li><a href="#syntax-break">dfn for syntax</a><span>, in § 14.1.2</span>
     </ul>
+   <li><a href="#statement-break-if">break-if</a><span>, in § 7.4.7</span>
+   <li><a href="#syntax-break_if_statement">break_if_statement</a><span>, in § 7.4.7</span>
    <li><a href="#syntax-break_statement">break_statement</a><span>, in § 7.4.6</span>
    <li><a href="#attribute-builtin">builtin</a><span>, in § 3.6</span>
    <li><a href="#built-in-functions">built-in functions</a><span>, in § 16</span>
@@ -10928,7 +11511,7 @@ stage.</p>
    <li><a href="#calling-function">calling function</a><span>, in § 8.2</span>
    <li><a href="#call-site">call site</a><span>, in § 8.2</span>
    <li><a href="#syntax-case">case</a><span>, in § 14.1.2</span>
-   <li><a href="#syntax-case_body">case_body</a><span>, in § 7.4.2</span>
+   <li><a href="#syntax-case_compound_statement">case_compound_statement</a><span>, in § 7.4.2</span>
    <li><a href="#syntax-case_selectors">case_selectors</a><span>, in § 7.4.2</span>
    <li><a href="#ceiling-expression">ceiling expression</a><span>, in § 1.2</span>
    <li><a href="#channel-format">channel format</a><span>, in § 4.5.1</span>
@@ -10956,17 +11539,18 @@ stage.</p>
    <li>
     continue
     <ul>
-     <li><a href="#statement-continue">dfn for statement</a><span>, in § 7.4.7</span>
+     <li><a href="#statement-continue">dfn for statement</a><span>, in § 7.4.8</span>
      <li><a href="#syntax-continue">dfn for syntax</a><span>, in § 14.1.2</span>
     </ul>
-   <li><a href="#syntax-continue_statement">continue_statement</a><span>, in § 7.4.7</span>
+   <li><a href="#syntax-continue_statement">continue_statement</a><span>, in § 7.4.8</span>
    <li>
     continuing
     <ul>
-     <li><a href="#statement-continuing">dfn for statement</a><span>, in § 7.4.8</span>
+     <li><a href="#statement-continuing">dfn for statement</a><span>, in § 7.4.9</span>
      <li><a href="#syntax-continuing">dfn for syntax</a><span>, in § 14.1.2</span>
     </ul>
-   <li><a href="#syntax-continuing_statement">continuing_statement</a><span>, in § 7.4.8</span>
+   <li><a href="#syntax-continuing_compound_statement">continuing_compound_statement</a><span>, in § 7.4.9</span>
+   <li><a href="#syntax-continuing_statement">continuing_statement</a><span>, in § 7.4.9</span>
    <li><a href="#control-barrier">control barrier</a><span>, in § 12.4.1</span>
    <li><a href="#syntax-core_lhs_expression">core_lhs_expression</a><span>, in § 6.18</span>
    <li><a href="#correctly-rounded">correctly rounded</a><span>, in § 12.5.1</span>
@@ -10981,7 +11565,7 @@ stage.</p>
    <li>
     discard
     <ul>
-     <li><a href="#statement-discard">dfn for statement</a><span>, in § 7.4.10</span>
+     <li><a href="#statement-discard">dfn for statement</a><span>, in § 7.4.11</span>
      <li><a href="#syntax-discard">dfn for syntax</a><span>, in § 14.1.2</span>
     </ul>
    <li><a href="#dispatch-command">dispatch command</a><span>, in § 1.1</span>
@@ -11018,6 +11602,7 @@ stage.</p>
      <li><a href="#statement-fallthrough">dfn for statement</a><span>, in § 7.4.2</span>
      <li><a href="#syntax-fallthrough">dfn for syntax</a><span>, in § 14.1.2</span>
     </ul>
+   <li><a href="#syntax-fallthrough_statement">fallthrough_statement</a><span>, in § 7.4.2</span>
    <li><a href="#syntax-false">false</a><span>, in § 14.1.2</span>
    <li><a href="#fixed-footprint">fixed footprint</a><span>, in § 4.2.12</span>
    <li><a href="#fixed-size-array">fixed-size array</a><span>, in § 4.2.8</span>
@@ -11209,13 +11794,13 @@ stage.</p>
    <li>
     return
     <ul>
-     <li><a href="#statement-return">dfn for statement</a><span>, in § 7.4.9</span>
+     <li><a href="#statement-return">dfn for statement</a><span>, in § 7.4.10</span>
      <li><a href="#syntax-return">dfn for syntax</a><span>, in § 14.1.2</span>
     </ul>
    <li><a href="#returns">returns</a><span>, in § 8.2</span>
-   <li><a href="#syntax-return_statement">return_statement</a><span>, in § 7.4.9</span>
+   <li><a href="#syntax-return_statement">return_statement</a><span>, in § 7.4.10</span>
    <li><a href="#return-type">return type</a><span>, in § 8.1</span>
-   <li><a href="#return-value">return value</a><span>, in § 7.4.9</span>
+   <li><a href="#return-value">return value</a><span>, in § 7.4.10</span>
    <li><a href="#right-hand-side">right-hand side</a><span>, in § 7.2</span>
    <li><a href="#roundup">roundUp</a><span>, in § 1.2</span>
    <li><a href="#runtime-sized">runtime-sized</a><span>, in § 4.2.8</span>
@@ -11876,13 +12461,14 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
     <li><a href="#ref-for-module-scope①⑧">9.3. Shader Interface</a> <a href="#ref-for-module-scope①⑨">(2)</a>
     <li><a href="#ref-for-module-scope②⓪">10.1. Enable Directive</a>
     <li><a href="#ref-for-module-scope②①">11. WGSL Program</a>
-    <li><a href="#ref-for-module-scope②②">16.8.2. textureGather</a> <a href="#ref-for-module-scope②③">(2)</a>
-    <li><a href="#ref-for-module-scope②④">16.8.3. textureGatherCompare</a>
-    <li><a href="#ref-for-module-scope②⑤">16.8.8. textureSample</a>
-    <li><a href="#ref-for-module-scope②⑥">16.8.9. textureSampleBias</a>
-    <li><a href="#ref-for-module-scope②⑦">16.8.10. textureSampleCompare</a>
-    <li><a href="#ref-for-module-scope②⑧">16.8.12. textureSampleGrad</a>
-    <li><a href="#ref-for-module-scope②⑨">16.8.13. textureSampleLevel</a>
+    <li><a href="#ref-for-module-scope②②">16. Built-in Functions</a>
+    <li><a href="#ref-for-module-scope②③">16.8.2. textureGather</a> <a href="#ref-for-module-scope②④">(2)</a>
+    <li><a href="#ref-for-module-scope②⑤">16.8.3. textureGatherCompare</a>
+    <li><a href="#ref-for-module-scope②⑥">16.8.8. textureSample</a>
+    <li><a href="#ref-for-module-scope②⑦">16.8.9. textureSampleBias</a>
+    <li><a href="#ref-for-module-scope②⑧">16.8.10. textureSampleCompare</a>
+    <li><a href="#ref-for-module-scope②⑨">16.8.12. textureSampleGrad</a>
+    <li><a href="#ref-for-module-scope③⓪">16.8.13. textureSampleLevel</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="type">
@@ -12035,8 +12621,8 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
     <li><a href="#ref-for-component-wise③①">6.10. Comparison Expressions</a> <a href="#ref-for-component-wise③②">(2)</a> <a href="#ref-for-component-wise③③">(3)</a> <a href="#ref-for-component-wise③④">(4)</a> <a href="#ref-for-component-wise③⑤">(5)</a> <a href="#ref-for-component-wise③⑥">(6)</a> <a href="#ref-for-component-wise③⑦">(7)</a> <a href="#ref-for-component-wise③⑧">(8)</a> <a href="#ref-for-component-wise③⑨">(9)</a> <a href="#ref-for-component-wise④⓪">(10)</a> <a href="#ref-for-component-wise④①">(11)</a> <a href="#ref-for-component-wise④②">(12)</a> <a href="#ref-for-component-wise④③">(13)</a> <a href="#ref-for-component-wise④④">(14)</a> <a href="#ref-for-component-wise④⑤">(15)</a> <a href="#ref-for-component-wise④⑥">(16)</a> <a href="#ref-for-component-wise④⑦">(17)</a> <a href="#ref-for-component-wise④⑧">(18)</a>
     <li><a href="#ref-for-component-wise④⑨">6.11. Bit Expressions</a> <a href="#ref-for-component-wise⑤⓪">(2)</a> <a href="#ref-for-component-wise⑤①">(3)</a> <a href="#ref-for-component-wise⑤②">(4)</a> <a href="#ref-for-component-wise⑤③">(5)</a> <a href="#ref-for-component-wise⑤④">(6)</a> <a href="#ref-for-component-wise⑤⑤">(7)</a>
     <li><a href="#ref-for-component-wise⑤⑥">16.1. Logical Built-in Functions</a>
-    <li><a href="#ref-for-component-wise⑤⑦">16.3. Float Built-in Functions</a> <a href="#ref-for-component-wise⑤⑧">(2)</a> <a href="#ref-for-component-wise⑤⑨">(3)</a> <a href="#ref-for-component-wise⑥⓪">(4)</a> <a href="#ref-for-component-wise⑥①">(5)</a> <a href="#ref-for-component-wise⑥②">(6)</a> <a href="#ref-for-component-wise⑥③">(7)</a> <a href="#ref-for-component-wise⑥④">(8)</a> <a href="#ref-for-component-wise⑥⑤">(9)</a> <a href="#ref-for-component-wise⑥⑥">(10)</a> <a href="#ref-for-component-wise⑥⑦">(11)</a> <a href="#ref-for-component-wise⑥⑧">(12)</a> <a href="#ref-for-component-wise⑥⑨">(13)</a> <a href="#ref-for-component-wise⑦⓪">(14)</a> <a href="#ref-for-component-wise⑦①">(15)</a> <a href="#ref-for-component-wise⑦②">(16)</a> <a href="#ref-for-component-wise⑦③">(17)</a> <a href="#ref-for-component-wise⑦④">(18)</a> <a href="#ref-for-component-wise⑦⑤">(19)</a> <a href="#ref-for-component-wise⑦⑥">(20)</a> <a href="#ref-for-component-wise⑦⑦">(21)</a> <a href="#ref-for-component-wise⑦⑧">(22)</a> <a href="#ref-for-component-wise⑦⑨">(23)</a> <a href="#ref-for-component-wise⑧⓪">(24)</a> <a href="#ref-for-component-wise⑧①">(25)</a> <a href="#ref-for-component-wise⑧②">(26)</a> <a href="#ref-for-component-wise⑧③">(27)</a> <a href="#ref-for-component-wise⑧④">(28)</a> <a href="#ref-for-component-wise⑧⑤">(29)</a> <a href="#ref-for-component-wise⑧⑥">(30)</a> <a href="#ref-for-component-wise⑧⑦">(31)</a> <a href="#ref-for-component-wise⑧⑧">(32)</a> <a href="#ref-for-component-wise⑧⑨">(33)</a> <a href="#ref-for-component-wise⑨⓪">(34)</a> <a href="#ref-for-component-wise⑨①">(35)</a>
-    <li><a href="#ref-for-component-wise⑨②">16.4. Integer Built-in Functions</a> <a href="#ref-for-component-wise⑨③">(2)</a> <a href="#ref-for-component-wise⑨④">(3)</a> <a href="#ref-for-component-wise⑨⑤">(4)</a> <a href="#ref-for-component-wise⑨⑥">(5)</a> <a href="#ref-for-component-wise⑨⑦">(6)</a> <a href="#ref-for-component-wise⑨⑧">(7)</a> <a href="#ref-for-component-wise⑨⑨">(8)</a> <a href="#ref-for-component-wise①⓪⓪">(9)</a> <a href="#ref-for-component-wise①⓪①">(10)</a> <a href="#ref-for-component-wise①⓪②">(11)</a> <a href="#ref-for-component-wise①⓪③">(12)</a> <a href="#ref-for-component-wise①⓪④">(13)</a> <a href="#ref-for-component-wise①⓪⑤">(14)</a> <a href="#ref-for-component-wise①⓪⑥">(15)</a> <a href="#ref-for-component-wise①⓪⑦">(16)</a> <a href="#ref-for-component-wise①⓪⑧">(17)</a> <a href="#ref-for-component-wise①⓪⑨">(18)</a>
+    <li><a href="#ref-for-component-wise⑤⑦">16.3. Float Built-in Functions</a> <a href="#ref-for-component-wise⑤⑧">(2)</a> <a href="#ref-for-component-wise⑤⑨">(3)</a> <a href="#ref-for-component-wise⑥⓪">(4)</a> <a href="#ref-for-component-wise⑥①">(5)</a> <a href="#ref-for-component-wise⑥②">(6)</a> <a href="#ref-for-component-wise⑥③">(7)</a> <a href="#ref-for-component-wise⑥④">(8)</a> <a href="#ref-for-component-wise⑥⑤">(9)</a> <a href="#ref-for-component-wise⑥⑥">(10)</a> <a href="#ref-for-component-wise⑥⑦">(11)</a> <a href="#ref-for-component-wise⑥⑧">(12)</a> <a href="#ref-for-component-wise⑥⑨">(13)</a> <a href="#ref-for-component-wise⑦⓪">(14)</a> <a href="#ref-for-component-wise⑦①">(15)</a> <a href="#ref-for-component-wise⑦②">(16)</a> <a href="#ref-for-component-wise⑦③">(17)</a> <a href="#ref-for-component-wise⑦④">(18)</a> <a href="#ref-for-component-wise⑦⑤">(19)</a> <a href="#ref-for-component-wise⑦⑥">(20)</a> <a href="#ref-for-component-wise⑦⑦">(21)</a> <a href="#ref-for-component-wise⑦⑧">(22)</a> <a href="#ref-for-component-wise⑦⑨">(23)</a> <a href="#ref-for-component-wise⑧⓪">(24)</a> <a href="#ref-for-component-wise⑧①">(25)</a> <a href="#ref-for-component-wise⑧②">(26)</a> <a href="#ref-for-component-wise⑧③">(27)</a> <a href="#ref-for-component-wise⑧④">(28)</a> <a href="#ref-for-component-wise⑧⑤">(29)</a> <a href="#ref-for-component-wise⑧⑥">(30)</a> <a href="#ref-for-component-wise⑧⑦">(31)</a> <a href="#ref-for-component-wise⑧⑧">(32)</a> <a href="#ref-for-component-wise⑧⑨">(33)</a> <a href="#ref-for-component-wise⑨⓪">(34)</a> <a href="#ref-for-component-wise⑨①">(35)</a> <a href="#ref-for-component-wise⑨②">(36)</a> <a href="#ref-for-component-wise⑨③">(37)</a> <a href="#ref-for-component-wise⑨④">(38)</a>
+    <li><a href="#ref-for-component-wise⑨⑤">16.4. Integer Built-in Functions</a> <a href="#ref-for-component-wise⑨⑥">(2)</a> <a href="#ref-for-component-wise⑨⑦">(3)</a> <a href="#ref-for-component-wise⑨⑧">(4)</a> <a href="#ref-for-component-wise⑨⑨">(5)</a> <a href="#ref-for-component-wise①⓪⓪">(6)</a> <a href="#ref-for-component-wise①⓪①">(7)</a> <a href="#ref-for-component-wise①⓪②">(8)</a> <a href="#ref-for-component-wise①⓪③">(9)</a> <a href="#ref-for-component-wise①⓪④">(10)</a> <a href="#ref-for-component-wise①⓪⑤">(11)</a> <a href="#ref-for-component-wise①⓪⑥">(12)</a> <a href="#ref-for-component-wise①⓪⑦">(13)</a> <a href="#ref-for-component-wise①⓪⑧">(14)</a> <a href="#ref-for-component-wise①⓪⑨">(15)</a> <a href="#ref-for-component-wise①①⓪">(16)</a> <a href="#ref-for-component-wise①①①">(17)</a> <a href="#ref-for-component-wise①①②">(18)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="matrix">
@@ -12412,8 +12998,8 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
     <li><a href="#ref-for-alignof">4.3.7. Memory Layout</a> <a href="#ref-for-alignof①">(2)</a>
     <li><a href="#ref-for-alignof②">4.3.7.1. Alignment and Size</a> <a href="#ref-for-alignof③">(2)</a> <a href="#ref-for-alignof④">(3)</a> <a href="#ref-for-alignof⑤">(4)</a> <a href="#ref-for-alignof⑥">(5)</a> <a href="#ref-for-alignof⑦">(6)</a> <a href="#ref-for-alignof⑧">(7)</a>
     <li><a href="#ref-for-alignof⑨">4.3.7.2. Structure Member Layout</a>
-    <li><a href="#ref-for-alignof①⓪">4.3.7.4. Internal Layout of Values</a>
-    <li><a href="#ref-for-alignof①①">4.3.7.5. Address Space Layout Constraints</a> <a href="#ref-for-alignof①②">(2)</a> <a href="#ref-for-alignof①③">(3)</a> <a href="#ref-for-alignof①④">(4)</a> <a href="#ref-for-alignof①⑤">(5)</a> <a href="#ref-for-alignof①⑥">(6)</a> <a href="#ref-for-alignof①⑦">(7)</a> <a href="#ref-for-alignof①⑧">(8)</a> <a href="#ref-for-alignof①⑨">(9)</a> <a href="#ref-for-alignof②⓪">(10)</a> <a href="#ref-for-alignof②①">(11)</a> <a href="#ref-for-alignof②②">(12)</a> <a href="#ref-for-alignof②③">(13)</a> <a href="#ref-for-alignof②④">(14)</a> <a href="#ref-for-alignof②⑤">(15)</a>
+    <li><a href="#ref-for-alignof①⓪">4.3.7.4. Internal Layout of Values</a> <a href="#ref-for-alignof①①">(2)</a>
+    <li><a href="#ref-for-alignof①②">4.3.7.5. Address Space Layout Constraints</a> <a href="#ref-for-alignof①③">(2)</a> <a href="#ref-for-alignof①④">(3)</a> <a href="#ref-for-alignof①⑤">(4)</a> <a href="#ref-for-alignof①⑥">(5)</a> <a href="#ref-for-alignof①⑦">(6)</a> <a href="#ref-for-alignof①⑧">(7)</a> <a href="#ref-for-alignof①⑨">(8)</a> <a href="#ref-for-alignof②⓪">(9)</a> <a href="#ref-for-alignof②①">(10)</a> <a href="#ref-for-alignof②②">(11)</a> <a href="#ref-for-alignof②③">(12)</a> <a href="#ref-for-alignof②④">(13)</a> <a href="#ref-for-alignof②⑤">(14)</a> <a href="#ref-for-alignof②⑥">(15)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="alignofmember">
@@ -12430,7 +13016,8 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
     <li><a href="#ref-for-sizeof①">4.3.7. Memory Layout</a> <a href="#ref-for-sizeof②">(2)</a>
     <li><a href="#ref-for-sizeof③">4.3.7.1. Alignment and Size</a> <a href="#ref-for-sizeof④">(2)</a> <a href="#ref-for-sizeof⑤">(3)</a> <a href="#ref-for-sizeof⑥">(4)</a>
     <li><a href="#ref-for-sizeof⑦">4.3.7.2. Structure Member Layout</a> <a href="#ref-for-sizeof⑧">(2)</a>
-    <li><a href="#ref-for-sizeof⑨">4.3.7.5. Address Space Layout Constraints</a>
+    <li><a href="#ref-for-sizeof⑨">4.3.7.4. Internal Layout of Values</a> <a href="#ref-for-sizeof①⓪">(2)</a> <a href="#ref-for-sizeof①①">(3)</a>
+    <li><a href="#ref-for-sizeof①②">4.3.7.5. Address Space Layout Constraints</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="sizeofmember">
@@ -12953,7 +13540,8 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
     <li><a href="#ref-for-syntax-expression①⓪">7.4.2. Switch Statement</a>
     <li><a href="#ref-for-syntax-expression①①">7.4.4. For Statement</a>
     <li><a href="#ref-for-syntax-expression①②">7.4.5. While Statement</a>
-    <li><a href="#ref-for-syntax-expression①③">7.4.9. Return Statement</a>
+    <li><a href="#ref-for-syntax-expression①③">7.4.7. Break-If Statement</a>
+    <li><a href="#ref-for-syntax-expression①④">7.4.10. Return Statement</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="compound-statement">
@@ -12962,7 +13550,7 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
     <li><a href="#ref-for-compound-statement">7.4.1. If Statement</a>
     <li><a href="#ref-for-compound-statement①">7.4.3. Loop Statement</a>
     <li><a href="#ref-for-compound-statement②">7.4.4. For Statement</a>
-    <li><a href="#ref-for-compound-statement③">7.4.8. Continuing Statement</a>
+    <li><a href="#ref-for-compound-statement③">7.4.9. Continuing Statement</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="syntax-compound_statement">
@@ -12971,9 +13559,8 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
     <li><a href="#ref-for-syntax-compound_statement">7.4.1. If Statement</a> <a href="#ref-for-syntax-compound_statement①">(2)</a>
     <li><a href="#ref-for-syntax-compound_statement②">7.4.4. For Statement</a>
     <li><a href="#ref-for-syntax-compound_statement③">7.4.5. While Statement</a>
-    <li><a href="#ref-for-syntax-compound_statement④">7.4.8. Continuing Statement</a>
-    <li><a href="#ref-for-syntax-compound_statement⑤">7.6. Statements Grammar Summary</a>
-    <li><a href="#ref-for-syntax-compound_statement⑥">8.1. Declaring a User-defined Function</a>
+    <li><a href="#ref-for-syntax-compound_statement④">7.6. Statements Grammar Summary</a>
+    <li><a href="#ref-for-syntax-compound_statement⑤">8.1. Declaring a User-defined Function</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="statement-assignment">
@@ -13082,10 +13669,20 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
     <li><a href="#ref-for-syntax-case_selectors">7.4.2. Switch Statement</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="syntax-case_body">
-   <b><a href="#syntax-case_body">#syntax-case_body</a></b><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="syntax-case_compound_statement">
+   <b><a href="#syntax-case_compound_statement">#syntax-case_compound_statement</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-syntax-case_body">7.4.2. Switch Statement</a> <a href="#ref-for-syntax-case_body①">(2)</a> <a href="#ref-for-syntax-case_body②">(3)</a>
+    <li><a href="#ref-for-syntax-case_compound_statement">7.1. Compound Statement</a>
+    <li><a href="#ref-for-syntax-case_compound_statement①">7.4.2. Switch Statement</a> <a href="#ref-for-syntax-case_compound_statement②">(2)</a>
+    <li><a href="#ref-for-syntax-case_compound_statement③">7.6. Statements Grammar Summary</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="syntax-fallthrough_statement">
+   <b><a href="#syntax-fallthrough_statement">#syntax-fallthrough_statement</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-syntax-fallthrough_statement">7.1. Compound Statement</a>
+    <li><a href="#ref-for-syntax-fallthrough_statement①">7.4.2. Switch Statement</a>
+    <li><a href="#ref-for-syntax-fallthrough_statement②">7.6. Statements Grammar Summary</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="statement-switch">
@@ -13106,8 +13703,9 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
    <ul>
     <li><a href="#ref-for-statement-loop">7.4.4. For Statement</a>
     <li><a href="#ref-for-statement-loop①">7.4.5. While Statement</a>
-    <li><a href="#ref-for-statement-loop②">7.4.6. Break Statement</a> <a href="#ref-for-statement-loop③">(2)</a>
-    <li><a href="#ref-for-statement-loop④">7.4.7. Continue Statement</a> <a href="#ref-for-statement-loop⑤">(2)</a>
+    <li><a href="#ref-for-statement-loop②">7.4.6. Break Statement</a>
+    <li><a href="#ref-for-statement-loop③">7.4.7. Break-If Statement</a>
+    <li><a href="#ref-for-statement-loop④">7.4.8. Continue Statement</a> <a href="#ref-for-statement-loop⑤">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="iteration">
@@ -13115,8 +13713,8 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
    <ul>
     <li><a href="#ref-for-iteration">7.4.4. For Statement</a> <a href="#ref-for-iteration①">(2)</a>
     <li><a href="#ref-for-iteration②">7.4.5. While Statement</a>
-    <li><a href="#ref-for-iteration③">7.4.7. Continue Statement</a>
-    <li><a href="#ref-for-iteration④">7.4.8. Continuing Statement</a>
+    <li><a href="#ref-for-iteration③">7.4.8. Continue Statement</a>
+    <li><a href="#ref-for-iteration④">7.4.9. Continuing Statement</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="syntax-for_statement">
@@ -13148,13 +13746,19 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
    <ul>
     <li><a href="#ref-for-statement-for">7.4.5. While Statement</a>
     <li><a href="#ref-for-statement-for①">7.4.6. Break Statement</a>
-    <li><a href="#ref-for-statement-for②">7.4.7. Continue Statement</a>
+    <li><a href="#ref-for-statement-for②">7.4.8. Continue Statement</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="syntax-while_statement">
    <b><a href="#syntax-while_statement">#syntax-while_statement</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-syntax-while_statement">7.6. Statements Grammar Summary</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="statement-while">
+   <b><a href="#statement-while">#statement-while</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-statement-while">7.4.6. Break Statement</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="syntax-break_statement">
@@ -13169,6 +13773,13 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
     <li><a href="#ref-for-statement-break">7.4.3. Loop Statement</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="syntax-break_if_statement">
+   <b><a href="#syntax-break_if_statement">#syntax-break_if_statement</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-syntax-break_if_statement">7.4.9. Continuing Statement</a>
+    <li><a href="#ref-for-syntax-break_if_statement①">7.6. Statements Grammar Summary</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="syntax-continue_statement">
    <b><a href="#syntax-continue_statement">#syntax-continue_statement</a></b><b>Referenced in:</b>
    <ul>
@@ -13181,13 +13792,20 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
     <li><a href="#ref-for-syntax-continuing_statement">7.4.3. Loop Statement</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="syntax-continuing_compound_statement">
+   <b><a href="#syntax-continuing_compound_statement">#syntax-continuing_compound_statement</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-syntax-continuing_compound_statement">7.1. Compound Statement</a>
+    <li><a href="#ref-for-syntax-continuing_compound_statement①">7.4.9. Continuing Statement</a>
+    <li><a href="#ref-for-syntax-continuing_compound_statement②">7.6. Statements Grammar Summary</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="statement-continuing">
    <b><a href="#statement-continuing">#statement-continuing</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-statement-continuing">7.4.3. Loop Statement</a>
     <li><a href="#ref-for-statement-continuing①">7.4.4. For Statement</a>
-    <li><a href="#ref-for-statement-continuing②">7.4.6. Break Statement</a>
-    <li><a href="#ref-for-statement-continuing③">7.4.7. Continue Statement</a> <a href="#ref-for-statement-continuing④">(2)</a> <a href="#ref-for-statement-continuing⑤">(3)</a>
+    <li><a href="#ref-for-statement-continuing②">7.4.8. Continue Statement</a> <a href="#ref-for-statement-continuing③">(2)</a> <a href="#ref-for-statement-continuing④">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="syntax-return_statement">
@@ -13200,8 +13818,8 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
    <b><a href="#statement-return">#statement-return</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-statement-return">7.4.3. Loop Statement</a>
-    <li><a href="#ref-for-statement-return①">7.4.8. Continuing Statement</a>
-    <li><a href="#ref-for-statement-return②">7.4.9. Return Statement</a>
+    <li><a href="#ref-for-statement-return①">7.4.9. Continuing Statement</a>
+    <li><a href="#ref-for-statement-return②">7.4.10. Return Statement</a>
     <li><a href="#ref-for-statement-return③">8.2. Function Calls</a> <a href="#ref-for-statement-return④">(2)</a>
    </ul>
   </aside>
@@ -13209,7 +13827,7 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
    <b><a href="#return-value">#return-value</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-return-value">1.1. Technical Overview</a>
-    <li><a href="#ref-for-return-value①">7.4.10. Discard Statement</a>
+    <li><a href="#ref-for-return-value①">7.4.11. Discard Statement</a>
     <li><a href="#ref-for-return-value②">7.5. Function Call Statement</a>
     <li><a href="#ref-for-return-value③">8.2. Function Calls</a>
     <li><a href="#ref-for-return-value④">9.3.1.1. Built-in Inputs and Outputs</a>
@@ -13219,7 +13837,7 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
    <b><a href="#statement-discard">#statement-discard</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-statement-discard">7.4.3. Loop Statement</a>
-    <li><a href="#ref-for-statement-discard①">7.4.8. Continuing Statement</a>
+    <li><a href="#ref-for-statement-discard①">7.4.9. Continuing Statement</a>
     <li><a href="#ref-for-statement-discard②">8.2. Function Calls</a>
    </ul>
   </aside>
@@ -13236,6 +13854,8 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
     <li><a href="#ref-for-syntax-statement">7.1. Compound Statement</a>
     <li><a href="#ref-for-syntax-statement①">7.4.2. Switch Statement</a>
     <li><a href="#ref-for-syntax-statement②">7.4.3. Loop Statement</a>
+    <li><a href="#ref-for-syntax-statement③">7.4.9. Continuing Statement</a>
+    <li><a href="#ref-for-syntax-statement④">7.6. Statements Grammar Summary</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="behavior">
@@ -13275,7 +13895,7 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
    <ul>
     <li><a href="#ref-for-return-type">3.5. Identifiers</a>
     <li><a href="#ref-for-return-type①">6.12. Function Call Expression</a>
-    <li><a href="#ref-for-return-type②">7.4.9. Return Statement</a>
+    <li><a href="#ref-for-return-type②">7.4.10. Return Statement</a>
     <li><a href="#ref-for-return-type③">8.2. Function Calls</a> <a href="#ref-for-return-type④">(2)</a>
     <li><a href="#ref-for-return-type⑤">9.2. Entry Point Declaration</a>
     <li><a href="#ref-for-return-type⑥">9.3.1.1. Built-in Inputs and Outputs</a> <a href="#ref-for-return-type⑦">(2)</a>
@@ -13362,7 +13982,7 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
     <li><a href="#ref-for-call-site">4.4.2. Originating Variable</a>
     <li><a href="#ref-for-call-site①">4.4.4. Forming Reference and Pointer Values</a>
     <li><a href="#ref-for-call-site②">6.14. Formal Parameter Expression</a>
-    <li><a href="#ref-for-call-site③">7.4.9. Return Statement</a>
+    <li><a href="#ref-for-call-site③">7.4.10. Return Statement</a>
     <li><a href="#ref-for-call-site④">8.2. Function Calls</a>
    </ul>
   </aside>
@@ -13372,8 +13992,8 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
     <li><a href="#ref-for-entry-point">1.1. Technical Overview</a>
     <li><a href="#ref-for-entry-point①">2. Shader Lifecycle</a>
     <li><a href="#ref-for-entry-point②">3.6. Attributes</a>
-    <li><a href="#ref-for-entry-point③">7.4.9. Return Statement</a>
-    <li><a href="#ref-for-entry-point④">7.4.10. Discard Statement</a>
+    <li><a href="#ref-for-entry-point③">7.4.10. Return Statement</a>
+    <li><a href="#ref-for-entry-point④">7.4.11. Discard Statement</a>
     <li><a href="#ref-for-entry-point⑤">8. Functions</a>
     <li><a href="#ref-for-entry-point⑥">9.2. Entry Point Declaration</a>
     <li><a href="#ref-for-entry-point⑦">9.3.1.1. Built-in Inputs and Outputs</a> <a href="#ref-for-entry-point⑧">(2)</a>
@@ -13408,7 +14028,7 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
    <b><a href="#gpurenderpipeline">#gpurenderpipeline</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-gpurenderpipeline">1.1. Technical Overview</a>
-    <li><a href="#ref-for-gpurenderpipeline①">7.4.10. Discard Statement</a>
+    <li><a href="#ref-for-gpurenderpipeline①">7.4.11. Discard Statement</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="shader-stages">
@@ -13446,7 +14066,7 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
    <b><a href="#fragment">#fragment</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-fragment">3.6. Attributes</a>
-    <li><a href="#ref-for-fragment①">7.4.10. Discard Statement</a>
+    <li><a href="#ref-for-fragment①">7.4.11. Discard Statement</a>
     <li><a href="#ref-for-fragment②">9.3.1.3. Interpolation</a> <a href="#ref-for-fragment③">(2)</a>
     <li><a href="#ref-for-fragment④">16.7. Derivative Built-in Functions</a>
     <li><a href="#ref-for-fragment⑤">16.8.8. textureSample</a>
@@ -13458,7 +14078,7 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
    <b><a href="#functions-in-a-shader-stage">#functions-in-a-shader-stage</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-functions-in-a-shader-stage">1.1. Technical Overview</a>
-    <li><a href="#ref-for-functions-in-a-shader-stage①">7.4.10. Discard Statement</a>
+    <li><a href="#ref-for-functions-in-a-shader-stage①">7.4.11. Discard Statement</a>
     <li><a href="#ref-for-functions-in-a-shader-stage②">9.3. Shader Interface</a>
     <li><a href="#ref-for-functions-in-a-shader-stage③">9.3.2. Resource Interface</a>
    </ul>
@@ -13898,6 +14518,7 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
    <b><a href="#syntax-break">#syntax-break</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-syntax-break">7.4.6. Break Statement</a>
+    <li><a href="#ref-for-syntax-break①">7.4.7. Break-If Statement</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="syntax-case">
@@ -13909,13 +14530,13 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
   <aside class="dfn-panel" data-for="syntax-continue">
    <b><a href="#syntax-continue">#syntax-continue</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-syntax-continue">7.4.7. Continue Statement</a>
+    <li><a href="#ref-for-syntax-continue">7.4.8. Continue Statement</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="syntax-continuing">
    <b><a href="#syntax-continuing">#syntax-continuing</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-syntax-continuing">7.4.8. Continuing Statement</a>
+    <li><a href="#ref-for-syntax-continuing">7.4.9. Continuing Statement</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="syntax-default">
@@ -13976,6 +14597,7 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
    <b><a href="#syntax-if">#syntax-if</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-syntax-if">7.4.1. If Statement</a>
+    <li><a href="#ref-for-syntax-if①">7.4.7. Break-If Statement</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="syntax-let">
@@ -13999,7 +14621,7 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
   <aside class="dfn-panel" data-for="syntax-return">
    <b><a href="#syntax-return">#syntax-return</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-syntax-return">7.4.9. Return Statement</a>
+    <li><a href="#ref-for-syntax-return">7.4.10. Return Statement</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="syntax-storage">
@@ -14116,8 +14738,9 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
    <ul>
     <li><a href="#ref-for-syntax-brace_left">4.2.9. Structure Types</a>
     <li><a href="#ref-for-syntax-brace_left①">7.1. Compound Statement</a>
-    <li><a href="#ref-for-syntax-brace_left②">7.4.2. Switch Statement</a> <a href="#ref-for-syntax-brace_left③">(2)</a> <a href="#ref-for-syntax-brace_left④">(3)</a>
-    <li><a href="#ref-for-syntax-brace_left⑤">7.4.3. Loop Statement</a>
+    <li><a href="#ref-for-syntax-brace_left②">7.4.2. Switch Statement</a> <a href="#ref-for-syntax-brace_left③">(2)</a>
+    <li><a href="#ref-for-syntax-brace_left④">7.4.3. Loop Statement</a>
+    <li><a href="#ref-for-syntax-brace_left⑤">7.4.9. Continuing Statement</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="syntax-brace_right">
@@ -14125,8 +14748,9 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
    <ul>
     <li><a href="#ref-for-syntax-brace_right">4.2.9. Structure Types</a>
     <li><a href="#ref-for-syntax-brace_right①">7.1. Compound Statement</a>
-    <li><a href="#ref-for-syntax-brace_right②">7.4.2. Switch Statement</a> <a href="#ref-for-syntax-brace_right③">(2)</a> <a href="#ref-for-syntax-brace_right④">(3)</a>
-    <li><a href="#ref-for-syntax-brace_right⑤">7.4.3. Loop Statement</a>
+    <li><a href="#ref-for-syntax-brace_right②">7.4.2. Switch Statement</a> <a href="#ref-for-syntax-brace_right③">(2)</a>
+    <li><a href="#ref-for-syntax-brace_right④">7.4.3. Loop Statement</a>
+    <li><a href="#ref-for-syntax-brace_right⑤">7.4.9. Continuing Statement</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="syntax-colon">
@@ -14288,9 +14912,10 @@ I’ve written what an NVIDIA GPU does.  See https://github.com/google/amber/pul
     <li><a href="#ref-for-syntax-semicolon">4.2.9. Structure Types</a>
     <li><a href="#ref-for-syntax-semicolon①">7.4.2. Switch Statement</a>
     <li><a href="#ref-for-syntax-semicolon②">7.4.4. For Statement</a> <a href="#ref-for-syntax-semicolon③">(2)</a>
-    <li><a href="#ref-for-syntax-semicolon④">7.6. Statements Grammar Summary</a> <a href="#ref-for-syntax-semicolon⑤">(2)</a> <a href="#ref-for-syntax-semicolon⑥">(3)</a> <a href="#ref-for-syntax-semicolon⑦">(4)</a> <a href="#ref-for-syntax-semicolon⑧">(5)</a> <a href="#ref-for-syntax-semicolon⑨">(6)</a> <a href="#ref-for-syntax-semicolon①⓪">(7)</a> <a href="#ref-for-syntax-semicolon①①">(8)</a> <a href="#ref-for-syntax-semicolon①②">(9)</a> <a href="#ref-for-syntax-semicolon①③">(10)</a>
-    <li><a href="#ref-for-syntax-semicolon①④">10.1. Enable Directive</a>
-    <li><a href="#ref-for-syntax-semicolon①⑤">11. WGSL Program</a> <a href="#ref-for-syntax-semicolon①⑥">(2)</a> <a href="#ref-for-syntax-semicolon①⑦">(3)</a> <a href="#ref-for-syntax-semicolon①⑧">(4)</a>
+    <li><a href="#ref-for-syntax-semicolon④">7.4.7. Break-If Statement</a>
+    <li><a href="#ref-for-syntax-semicolon⑤">7.6. Statements Grammar Summary</a> <a href="#ref-for-syntax-semicolon⑥">(2)</a> <a href="#ref-for-syntax-semicolon⑦">(3)</a> <a href="#ref-for-syntax-semicolon⑧">(4)</a> <a href="#ref-for-syntax-semicolon⑨">(5)</a> <a href="#ref-for-syntax-semicolon①⓪">(6)</a> <a href="#ref-for-syntax-semicolon①①">(7)</a> <a href="#ref-for-syntax-semicolon①②">(8)</a> <a href="#ref-for-syntax-semicolon①③">(9)</a> <a href="#ref-for-syntax-semicolon①④">(10)</a>
+    <li><a href="#ref-for-syntax-semicolon①⑤">10.1. Enable Directive</a>
+    <li><a href="#ref-for-syntax-semicolon①⑥">11. WGSL Program</a> <a href="#ref-for-syntax-semicolon①⑦">(2)</a> <a href="#ref-for-syntax-semicolon①⑧">(3)</a> <a href="#ref-for-syntax-semicolon①⑨">(4)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="syntax-star">
