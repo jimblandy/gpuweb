@@ -8899,15 +8899,16 @@ See [[#statements]] and [[#function-calls]].
 
 [[#collective-operations|Collective operations]] (e.g. barriers and
 derivatives) require coordination among different invocations running
-concurrently on the GPU.  To ensure correct and portable behavior, WGSL
-requires that these operations can be statically analyzed to not have any
-control dependencies such that a non-empty strict subset of invocations will
-execute the operation (i.e. the operation must be executed in [=uniform control
-flow=]).
-Non-uniform control dependencies arise from [[#control-flow|control flow]]
+concurrently on the GPU. To ensure correct and portable behavior, WGSL
+requires that these operations must be executed in [=uniform control
+flow=]: that is, they can be statically determined to either execute
+in all invocations, or in none of them, regardless of what control
+structures they appear within.
+Non-uniform control flow arises from [[#control-flow|control flow]]
 statements whose behavior depends on [=uniform value|non-uniform values=].
 These non-uniform values can be traced back to certain sources that are not
 statically proven to be uniform.
+
 These sources include, but are not limited to:
 * Mutable [=module scope|module-scope=] [=variables=]
 * Most [=built-in values=], except [=built-in values/num_workgroups=] and [=built-in values/workgroup_id=]
